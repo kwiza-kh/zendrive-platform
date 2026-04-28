@@ -1,0 +1,50 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --ink-900: #0f172a;
+  --ink-800: #1e293b;
+  --accent: #dc2626;
+  --bg: #f8fafc;
+}
+
+html, body, #root { height: 100%; }
+body {
+  margin: 0;
+  font-family: "Montserrat", system-ui, -apple-system, sans-serif;
+  color: var(--ink-900);
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* { box-sizing: border-box; }
+
+@layer components {
+  .container-zen { @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8; }
+
+  .btn { @apply inline-flex items-center justify-center gap-2 font-semibold rounded-md transition-all duration-200 cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-2; }
+  .btn-primary { @apply btn bg-accent text-white px-6 py-3 hover:bg-accent-dark hover:shadow-glow focus:ring-accent; }
+  .btn-dark { @apply btn bg-ink-900 text-white px-6 py-3 hover:bg-ink-800 focus:ring-ink-900; }
+  .btn-outline { @apply btn border-2 border-ink-900 text-ink-900 px-6 py-3 hover:bg-ink-900 hover:text-white focus:ring-ink-900; }
+  .btn-ghost { @apply btn text-ink-700 hover:text-accent px-3 py-2; }
+
+  .card { @apply bg-white rounded-xl shadow-soft border border-zen-line overflow-hidden transition-all duration-300; }
+  .card-hover { @apply hover:-translate-y-1 hover:shadow-[0_24px_60px_-20px_rgba(15,23,42,0.35)]; }
+
+  .badge { @apply inline-flex items-center gap-1 text-xs font-bold uppercase tracking-wider px-2.5 py-1 rounded; }
+  .badge-accent { @apply badge bg-accent text-white; }
+  .badge-dark { @apply badge bg-ink-900 text-white; }
+  .badge-soft { @apply badge bg-zen-line text-ink-700; }
+
+  .chip { @apply inline-flex items-center gap-1.5 text-sm font-medium px-3 py-1.5 rounded-full bg-white border border-zen-line text-ink-700; }
+
+  .section-title { @apply font-display text-4xl md:text-5xl text-ink-900 font-semibold tracking-tight; }
+  .section-eyebrow { @apply text-accent text-xs font-bold uppercase tracking-[0.25em] mb-3; }
+
+  .input { @apply w-full px-4 py-3 border border-zen-line rounded-md bg-white focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/20 transition; }
+  .label { @apply text-sm font-semibold text-ink-800 mb-1.5 block; }
+}
+
+::selection { background: #dc2626; color: white; }

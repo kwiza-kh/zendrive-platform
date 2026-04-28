@@ -1,0 +1,57 @@
+import React from "react";
+import { Link } from "react-router-dom";
+import { FiZap, FiSettings, FiUsers, FiActivity } from "react-icons/fi";
+import { resolveImage, formatPrice } from "../utils/constants";
+
+export default function CarCard({ car }) {
+  const hasDiscount = car.discount_price && car.discount_price < car.price;
+  return (
+    <Link to={`/cars/${car.slug}`} className="card card-hover group">
+      <div className="relative h-56 bg-ink-900 overflow-hidden">
+        <img
+          src={resolveImage(car.image)}
+          alt={car.name}
+          className="w-full h-full object-cover group-hover:scale-105 transition duration-500"
+        />
+        <div className="absolute top-3 left-3 flex flex-col gap-1.5">
+          {hasDiscount && <span className="badge-accent">Save {formatPrice(car.price - car.discount_price)}</span>}
+          {car.is_new && !hasDiscount && <span className="badge-dark">New 2025</span>}
+          {car.is_featured && <span className="badge-soft">Featured</span>}
+        </div>
+        <div className="absolute bottom-3 right-3 flex items-center gap-1 px-2.5 py-1 rounded bg-ink-900/80 backdrop-blur text-white text-xs font-semibold">
+          {car.fuel_type === "Electric" ? <FiZap className="text-accent" /> : <FiActivity className="text-accent" />}
+          {car.fuel_type}
+        </div>
+      </div>
+      <div className="p-5">
+        <div className="flex items-start justify-between gap-2 mb-1">
+          <p className="text-xs uppercase tracking-widest text-ink-500 font-semibold">{car.brand?.name || "Zendrive"}</p>
+          <span className="text-xs text-ink-500">{car.year}</span>
+        </div>
+        <h3 className="font-display text-2xl text-ink-900 leading-tight group-hover:text-accent transition">
+          {car.name}
+        </h3>
+
+        <div className="grid grid-cols-3 gap-2 mt-4 mb-5 text-xs text-ink-700">
+          <div className="flex items-center gap-1.5"><FiActivity className="text-accent" /> {car.horsepower} HP</div>
+          <div className="flex items-center gap-1.5"><FiSettings className="text-accent" /> {car.transmission}</div>
+          <div className="flex items-center gap-1.5"><FiUsers className="text-accent" /> {car.seats} seats</div>
+        </div>
+
+        <div className="flex items-end justify-between border-t border-zen-line pt-4">
+          <div>
+            {hasDiscount ? (
+              <>
+                <p className="text-xs line-through text-ink-500">{formatPrice(car.price)}</p>
+                <p className="text-2xl font-bold text-accent">{formatPrice(car.discount_price)}</p>
+              </>
+            ) : (
+              <p className="text-2xl font-bold text-ink-900">{formatPrice(car.price)}</p>
+            )}
+          </div>
+          <span className="text-sm font-semibold text-ink-700 group-hover:text-accent transition">View →</span>
+        </div>
+      </div>
+    </Link>
+  );
+}

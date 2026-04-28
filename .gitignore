@@ -1,0 +1,39 @@
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Build output
+build/
+dist/
+**/build/
+**/dist/
+
+# Python
+__pycache__/
+**/__pycache__/
+*.pyc
+.venv/
+**/.venv/
+
+# Local DB / uploads (re-created on first run)
+zendrive.db
+**/zendrive.db
+uploads/
+**/uploads/
+
+# Env / secrets
+.env
+**/.env
+!.env.example
+!**/.env.example
+
+# Vercel CLI link state
+.vercel
+**/.vercel
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.log

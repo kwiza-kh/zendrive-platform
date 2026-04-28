@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 60" width="240" height="60">
+  <defs>
+    <linearGradient id="z" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#DC2626"/>
+      <stop offset="1" stop-color="#7F1D1D"/>
+    </linearGradient>
+  </defs>
+  <g fill="none" stroke="none">
+    <!-- "Z" badge -->
+    <rect x="4" y="6" width="48" height="48" rx="10" fill="#0F172A"/>
+    <path d="M16 18 L40 18 L18 38 L40 38 L40 44 L14 44 L36 24 L16 24 Z" fill="url(#z)"/>
+    <!-- speed lines -->
+    <rect x="44" y="14" width="6" height="2" rx="1" fill="#DC2626" opacity=".7"/>
+    <rect x="46" y="20" width="4" height="2" rx="1" fill="#DC2626" opacity=".5"/>
+    <!-- Wordmark -->
+    <text x="64" y="38" font-family="Montserrat, Arial, sans-serif" font-size="26" font-weight="800" fill="#0F172A" letter-spacing="0.5">ZEN<tspan fill="#DC2626">DRIVE</tspan></text>
+  </g>
+</svg>
