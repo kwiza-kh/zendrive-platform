@@ -56,12 +56,14 @@ export default function CarForm() {
   };
 
   return (
-    <div className="p-8 max-w-4xl">
-      <Link to="/cars" className="inline-flex items-center gap-2 text-sm font-semibold text-ink-700 hover:text-accent mb-4"><FiArrowLeft /> Back</Link>
-      <h1 className="font-display text-4xl mb-1">{isEdit ? "Edit Car" : "Add Car"}</h1>
-      <p className="text-ink-500 mb-8">Fill in vehicle details to publish it on Zendrive.</p>
+    <div className="page-content max-w-4xl">
+      <Link to="/cars" className="inline-flex items-center gap-2 text-sm font-medium text-ink-500 hover:text-accent mb-5 transition-colors"><FiArrowLeft size={14} /> Back to Inventory</Link>
+      <div className="page-header">
+        <h1 className="page-title">{isEdit ? "Edit Car" : "Add Car"}</h1>
+        <p className="page-subtitle">Fill in vehicle details to publish it on Zendrive.</p>
+      </div>
 
-      <form onSubmit={submit} className="card p-7 space-y-5">
+      <form onSubmit={submit} className="card p-6 lg:p-8 space-y-5">
         <div className="grid md:grid-cols-2 gap-4">
           <div><label className="label">Name</label><input className="input" required value={form.name} onChange={(e) => onName(e.target.value)} /></div>
           <div><label className="label">Slug</label><input className="input" required value={form.slug} onChange={(e) => set("slug", slugify(e.target.value))} /></div>

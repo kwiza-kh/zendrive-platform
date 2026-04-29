@@ -50,4 +50,8 @@ export const contactInfoApi = {
   list: () => api.get("/api/contact-info"),
 };
 
+export const socialMediaApi = {
+  list: () => api.get("/api/social-media"),
+};
+
 export default api;

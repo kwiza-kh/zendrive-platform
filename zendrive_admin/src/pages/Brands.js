@@ -120,9 +120,11 @@ export default function Brands() {
   };
 
   return (
-    <div className="p-8 max-w-3xl">
-      <h1 className="font-display text-4xl mb-1">Brands</h1>
-      <p className="text-ink-500 mb-6">Manage the marques displayed on Zendrive.</p>
+    <div className="page-content max-w-3xl">
+      <div className="page-header">
+        <h1 className="page-title">Brands</h1>
+        <p className="page-subtitle">Manage the marques displayed on Zendrive.</p>
+      </div>
 
       <form onSubmit={add} className="card p-5 space-y-3 mb-6">
         <input className="input" placeholder="New brand name" value={name} onChange={(e) => setName(e.target.value)} />

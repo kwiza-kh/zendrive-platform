@@ -1,8 +1,27 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { FiPhone, FiMail, FiMapPin, FiInstagram, FiFacebook, FiTwitter, FiYoutube } from "react-icons/fi";
+import { FiPhone, FiMail, FiMapPin, FiInstagram, FiFacebook, FiTwitter, FiYoutube, FiLinkedin } from "react-icons/fi";
+import { FaWhatsapp, FaTiktok, FaTelegramPlane } from "react-icons/fa";
+import { socialMediaApi } from "../services/api";
+
+const PLATFORM_ICON = {
+  instagram: FiInstagram,
+  facebook:  FiFacebook,
+  twitter:   FiTwitter,
+  youtube:   FiYoutube,
+  linkedin:  FiLinkedin,
+  whatsapp:  FaWhatsapp,
+  tiktok:    FaTiktok,
+  telegram:  FaTelegramPlane,
+};
 
 export default function Footer() {
+  const [socials, setSocials] = useState([]);
+
+  useEffect(() => {
+    socialMediaApi.list().then((r) => setSocials(r.data)).catch(() => {});
+  }, []);
+
   return (
     <footer className="bg-ink-900 text-zen-line mt-24">
       <div className="container-zen py-16 grid gap-10 md:grid-cols-4">
@@ -18,13 +37,27 @@ export default function Footer() {
             Zendrive curates the world's finest vehicles — from electric performance to executive grand tourers.
             Drive smarter. Drive bolder.
           </p>
-          <div className="flex items-center gap-3 mt-6">
-            {[FiInstagram, FiFacebook, FiTwitter, FiYoutube].map((Icon, i) => (
-              <a key={i} href="#" className="w-10 h-10 grid place-items-center rounded-full bg-white/5 hover:bg-accent transition text-white">
-                <Icon size={16} />
-              </a>
-            ))}
-          </div>
+
+          {socials.length > 0 && (
+            <div className="flex items-center gap-3 mt-6 flex-wrap">
+              {socials.map((s) => {
+                const Icon = PLATFORM_ICON[s.platform];
+                if (!Icon) return null;
+                return (
+                  <a
+                    key={s.platform}
+                    href={s.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    title={s.platform.charAt(0).toUpperCase() + s.platform.slice(1)}
+                    className="w-10 h-10 grid place-items-center rounded-full bg-white/5 hover:bg-accent transition-colors text-white"
+                  >
+                    <Icon size={16} />
+                  </a>
+                );
+              })}
+            </div>
+          )}
         </div>
 
         <div>

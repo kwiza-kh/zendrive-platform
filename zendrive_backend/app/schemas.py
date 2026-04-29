@@ -177,3 +177,20 @@ class ContactInfoOut(ContactInfoBase):
 
     class Config:
         from_attributes = True
+
+
+class SocialMediaOut(BaseModel):
+    id: int
+    platform: str
+    url: str
+    enabled: bool
+    sort_order: int
+
+    class Config:
+        from_attributes = True
+
+
+class SocialMediaUpdate(BaseModel):
+    url: Optional[str] = None
+    enabled: Optional[bool] = None
+    sort_order: Optional[int] = None

@@ -205,5 +205,22 @@ def init_db() -> None:
                 models.ContactInfo(kind="hours", label="Hours", value="Mon–Sat: 9am – 8pm · Sun: 10am – 6pm", link=None, sort_order=3),
             ])
             db.commit()
+
+        # Social media platforms (idempotent – add missing rows, never delete)
+        DEFAULT_SOCIAL = [
+            ("instagram", 0),
+            ("facebook",  1),
+            ("twitter",   2),
+            ("youtube",   3),
+            ("linkedin",  4),
+            ("tiktok",    5),
+            ("telegram",  6),
+            ("whatsapp",  7),
+        ]
+        for platform, order in DEFAULT_SOCIAL:
+            exists = db.query(models.SocialMedia).filter(models.SocialMedia.platform == platform).first()
+            if not exists:
+                db.add(models.SocialMedia(platform=platform, url="", enabled=False, sort_order=order))
+        db.commit()
     finally:
         db.close()

@@ -1,6 +1,7 @@
 import React from "react";
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import Sidebar from "./components/Sidebar";
+import TopBar from "./components/TopBar";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import CarsList from "./pages/CarsList";
@@ -9,6 +10,7 @@ import Brands from "./pages/Brands";
 import BodyTypes from "./pages/BodyTypes";
 import Inquiries from "./pages/Inquiries";
 import ContactInfo from "./pages/ContactInfo";
+import SocialMedia from "./pages/SocialMedia";
 
 const isAuthed = () => !!localStorage.getItem("admin_token");
 
@@ -20,9 +22,14 @@ function Protected({ children }) {
 
 function Shell({ children }) {
   return (
-    <div className="flex min-h-screen">
+    <div className="flex min-h-screen bg-zen-bg">
       <Sidebar />
-      <div className="flex-1 ml-64">{children}</div>
+      <div className="flex-1 ml-64 flex flex-col min-h-screen">
+        <TopBar />
+        <main className="flex-1 overflow-auto">
+          {children}
+        </main>
+      </div>
     </div>
   );
 }
@@ -43,6 +50,7 @@ export default function App() {
               <Route path="/body-types" element={<BodyTypes />} />
               <Route path="/inquiries" element={<Inquiries />} />
               <Route path="/contact-info" element={<ContactInfo />} />
+              <Route path="/social-media" element={<SocialMedia />} />
             </Routes>
           </Shell>
         </Protected>

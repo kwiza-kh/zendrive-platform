@@ -42,9 +42,11 @@ export default function BodyTypes() {
   };
 
   return (
-    <div className="p-8 max-w-3xl">
-      <h1 className="font-display text-4xl mb-1">Body Types</h1>
-      <p className="text-ink-500 mb-6">Manage the body categories used across the site (Sedan, SUV, Coupe…).</p>
+    <div className="page-content max-w-3xl">
+      <div className="page-header">
+        <h1 className="page-title">Body Types</h1>
+        <p className="page-subtitle">Manage the body categories used across the site (Sedan, SUV, Coupe…).</p>
+      </div>
 
       <form onSubmit={add} className="card p-5 grid sm:grid-cols-[1fr_auto] gap-3 mb-6">
         <input className="input" placeholder="New body type (e.g. Hatchback)" value={name} onChange={(e) => setName(e.target.value)} />

@@ -166,13 +166,15 @@ export default function ContactInfo() {
   );
 
   return (
-    <div className="p-8 max-w-3xl">
-      <h1 className="font-display text-4xl mb-1">Contact Info</h1>
-      <p className="text-ink-500 mb-6">
-        Manage the contact details shown on the public Contact page. For
-        addresses, set a link to open Google Maps (or any map service) when
-        users click.
-      </p>
+    <div className="page-content max-w-3xl">
+      <div className="page-header">
+        <h1 className="page-title">Contact Info</h1>
+        <p className="page-subtitle">
+          Manage the contact details shown on the public Contact page. For
+          addresses, set a link to open Google Maps (or any map service) when
+          users click.
+        </p>
+      </div>
 
       <form onSubmit={submit} className="card p-5 space-y-3 mb-6">
         <RowForm

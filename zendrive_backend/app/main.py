@@ -339,6 +339,40 @@ def delete_contact_info(item_id: int, db: Session = Depends(get_db), _: models.U
     return {"ok": True}
 
 
+# ==================== SOCIAL MEDIA ====================
+@app.get("/api/social-media", response_model=List[schemas.SocialMediaOut])
+def list_social_media_public(db: Session = Depends(get_db)):
+    """Public endpoint — returns only enabled platforms."""
+    return (
+        db.query(models.SocialMedia)
+        .filter(models.SocialMedia.enabled == True)
+        .order_by(models.SocialMedia.sort_order)
+        .all()
+    )
+
+
+@app.get("/api/social-media/all", response_model=List[schemas.SocialMediaOut])
+def list_social_media_all(db: Session = Depends(get_db), _: models.User = Depends(require_admin)):
+    """Admin endpoint — returns every platform regardless of enabled status."""
+    return db.query(models.SocialMedia).order_by(models.SocialMedia.sort_order).all()
+
+
+@app.put("/api/social-media/{platform}", response_model=schemas.SocialMediaOut)
+def update_social_media(
+    platform: str,
+    payload: schemas.SocialMediaUpdate,
+    db: Session = Depends(get_db),
+    _: models.User = Depends(require_admin),
+):
+    item = db.query(models.SocialMedia).filter(models.SocialMedia.platform == platform).first()
+    if not item:
+        raise HTTPException(status_code=404, detail="Platform not found")
+    for k, v in payload.model_dump(exclude_unset=True).items():
+        setattr(item, k, v)
+    db.commit(); db.refresh(item)
+    return item
+
+
 # ==================== UPLOAD ====================
 ALLOWED_IMAGE_EXT = {".jpg", ".jpeg", ".png", ".webp", ".gif", ".svg"}
 

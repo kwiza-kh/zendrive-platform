@@ -77,3 +77,12 @@ class Inquiry(Base):
     message = Column(Text, default="")
     status = Column(String(20), default="new")  # new, contacted, closed
     created_at = Column(DateTime, default=datetime.utcnow)
+
+
+class SocialMedia(Base):
+    __tablename__ = "social_media"
+    id = Column(Integer, primary_key=True, index=True)
+    platform = Column(String(40), unique=True, nullable=False)  # instagram, facebook, twitter, etc.
+    url = Column(String(500), default="")
+    enabled = Column(Boolean, default=False)
+    sort_order = Column(Integer, default=0)
