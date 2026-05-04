@@ -31,6 +31,9 @@ uploads/
 .vercel
 **/.vercel
 
+# Docker data (persisted locally, not committed)
+data/
+
 # OS / editor
 .DS_Store
 Thumbs.db

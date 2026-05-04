@@ -32,12 +32,7 @@ class Settings:
 
     DATABASE_URL: str = _normalize_db_url(os.getenv("DATABASE_URL", "sqlite:///./zendrive.db"))
 
-    # Local upload dir (only used in local dev). On Vercel we use Vercel Blob.
     UPLOAD_DIR: str = os.getenv("UPLOAD_DIR", "uploads")
-    BLOB_READ_WRITE_TOKEN: str = os.getenv("BLOB_READ_WRITE_TOKEN", "")
-
-    # Detect serverless / read-only filesystem environments (Vercel).
-    IS_SERVERLESS: bool = bool(os.getenv("VERCEL") or os.getenv("AWS_LAMBDA_FUNCTION_NAME"))
 
 
 settings = Settings()

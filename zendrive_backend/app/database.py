@@ -9,9 +9,8 @@ engine = create_engine(
     _url,
     connect_args={"check_same_thread": False} if _is_sqlite else {},
     pool_pre_ping=True,
-    # Small pool — Vercel functions are short-lived; avoid exhausting Neon quota.
-    pool_size=2,
-    max_overflow=3,
+    pool_size=10,
+    max_overflow=20,
     pool_recycle=300,
 )
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)

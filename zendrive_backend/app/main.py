@@ -26,23 +26,17 @@ ALLOWED_ORIGINS = [
     *_extra_origins,
 ]
 
-# Always allow any *.vercel.app preview/production URL so frontend deployments
-# don't require redeploying the backend just to update the CORS allowlist.
 app.add_middleware(
     CORSMiddleware,
     allow_origins=ALLOWED_ORIGINS,
-    allow_origin_regex=r"https://.*\.vercel\.app",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Local-only static uploads. On Vercel the filesystem is read-only and we use
-# Vercel Blob instead (see /api/upload below).
-if not settings.IS_SERVERLESS:
-    from fastapi.staticfiles import StaticFiles
-    os.makedirs(settings.UPLOAD_DIR, exist_ok=True)
-    app.mount("/uploads", StaticFiles(directory=settings.UPLOAD_DIR), name="uploads")
+from fastapi.staticfiles import StaticFiles
+os.makedirs(settings.UPLOAD_DIR, exist_ok=True)
+app.mount("/uploads", StaticFiles(directory=settings.UPLOAD_DIR), name="uploads")
 
 
 _DB_INITIALIZED = False
@@ -460,42 +454,6 @@ async def upload(file: UploadFile = File(...), _: models.User = Depends(require_
     name = f"{uuid.uuid4().hex}{ext}"
     data = await file.read()
 
-    # On Vercel (read-only FS), upload to Vercel Blob.
-    if settings.IS_SERVERLESS or settings.BLOB_READ_WRITE_TOKEN:
-        token = settings.BLOB_READ_WRITE_TOKEN
-        if not token:
-            raise HTTPException(
-                status_code=500,
-                detail="BLOB_READ_WRITE_TOKEN is not configured on the server.",
-            )
-        import httpx
-        content_type = file.content_type or "application/octet-stream"
-        # Vercel Blob "PUT /<pathname>" upload API.
-        # Docs: https://vercel.com/docs/storage/vercel-blob/using-blob-sdk
-        try:
-            async with httpx.AsyncClient(timeout=30) as client:
-                resp = await client.put(
-                    f"https://blob.vercel-storage.com/{name}",
-                    content=data,
-                    headers={
-                        "authorization": f"Bearer {token}",
-                        "x-content-type": content_type,
-                        "x-add-random-suffix": "0",
-                        "x-api-version": "7",
-                    },
-                )
-            if resp.status_code >= 300:
-                raise HTTPException(status_code=502, detail=f"Blob upload failed: {resp.text[:200]}")
-            url = resp.json().get("url")
-            if not url:
-                raise HTTPException(status_code=502, detail="Blob upload returned no URL")
-            return {"url": url}
-        except HTTPException:
-            raise
-        except Exception as e:
-            raise HTTPException(status_code=502, detail=f"Blob upload error: {e}")
-
-    # Local dev — write to ./uploads.
     os.makedirs(settings.UPLOAD_DIR, exist_ok=True)
     path = os.path.join(settings.UPLOAD_DIR, name)
     with open(path, "wb") as f:
