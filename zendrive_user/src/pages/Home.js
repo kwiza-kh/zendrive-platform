@@ -41,7 +41,7 @@ export default function Home() {
               Browse Inventory <FiArrowRight />
             </Link>
             <Link to="/contact" className="btn !border-2 !border-white/30 !text-white !px-8 !py-4 hover:!bg-white hover:!text-ink-900">
-              Book a Test Drive
+              Contact Us
             </Link>
           </div>
 

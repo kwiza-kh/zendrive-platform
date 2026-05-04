@@ -44,6 +44,7 @@ export const bodyTypesApi = {
 
 export const inquiriesApi = {
   create: (data) => api.post("/api/inquiries", data),
+  myList: () => api.get("/api/my-inquiries"),
 };
 
 export const contactInfoApi = {
@@ -52,6 +53,13 @@ export const contactInfoApi = {
 
 export const socialMediaApi = {
   list: () => api.get("/api/social-media"),
+};
+
+export const cartApi = {
+  list: () => api.get("/api/cart"),
+  add: (car_id) => api.post("/api/cart", { car_id }),
+  remove: (item_id) => api.delete(`/api/cart/${item_id}`),
+  clear: () => api.delete("/api/cart"),
 };
 
 export default api;

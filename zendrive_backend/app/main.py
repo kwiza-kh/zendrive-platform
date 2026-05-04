@@ -9,7 +9,7 @@ from .database import get_db
 from . import models, schemas
 from .auth import (
     hash_password, verify_password, create_access_token,
-    get_current_user, require_admin,
+    get_current_user, get_optional_user, require_admin,
 )
 from .config import settings
 from .seed import init_db
@@ -281,8 +281,11 @@ def delete_car(car_id: int, db: Session = Depends(get_db), _: models.User = Depe
 
 # ==================== INQUIRIES ====================
 @app.post("/api/inquiries", response_model=schemas.InquiryOut)
-def create_inquiry(payload: schemas.InquiryCreate, db: Session = Depends(get_db)):
-    inq = models.Inquiry(**payload.model_dump())
+def create_inquiry(payload: schemas.InquiryCreate, db: Session = Depends(get_db), user: Optional[models.User] = Depends(get_optional_user)):
+    data = payload.model_dump()
+    if user:
+        data["user_id"] = user.id
+    inq = models.Inquiry(**data)
     db.add(inq); db.commit(); db.refresh(inq)
     return inq
 
@@ -290,6 +293,16 @@ def create_inquiry(payload: schemas.InquiryCreate, db: Session = Depends(get_db)
 @app.get("/api/inquiries", response_model=List[schemas.InquiryOut])
 def list_inquiries(db: Session = Depends(get_db), _: models.User = Depends(require_admin)):
     return db.query(models.Inquiry).order_by(models.Inquiry.created_at.desc()).all()
+
+
+@app.get("/api/my-inquiries", response_model=List[schemas.InquiryOut])
+def list_my_inquiries(user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
+    return (
+        db.query(models.Inquiry)
+        .filter(models.Inquiry.user_id == user.id)
+        .order_by(models.Inquiry.created_at.desc())
+        .all()
+    )
 
 
 @app.put("/api/inquiries/{inq_id}", response_model=schemas.InquiryOut)
@@ -300,6 +313,67 @@ def update_inquiry(inq_id: int, status: str, db: Session = Depends(get_db), _: m
     inq.status = status
     db.commit(); db.refresh(inq)
     return inq
+
+
+# ==================== CART ====================
+@app.get("/api/cart")
+def get_cart(user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
+    items = (
+        db.query(models.CartItem)
+        .filter(models.CartItem.user_id == user.id)
+        .order_by(models.CartItem.created_at.desc())
+        .all()
+    )
+    total = 0.0
+    out = []
+    for ci in items:
+        car = ci.car
+        price = car.discount_price if (car.discount_price and car.discount_price < car.price) else car.price
+        total += price
+        out.append({
+            "id": ci.id,
+            "car_id": ci.car_id,
+            "created_at": ci.created_at,
+            "car": car,
+        })
+    return {"items": out, "total": total}
+
+
+@app.post("/api/cart")
+def add_to_cart(payload: schemas.CartItemCreate, user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
+    car = db.query(models.Car).filter(models.Car.id == payload.car_id).first()
+    if not car:
+        raise HTTPException(status_code=404, detail="Car not found")
+    existing = (
+        db.query(models.CartItem)
+        .filter(models.CartItem.user_id == user.id, models.CartItem.car_id == payload.car_id)
+        .first()
+    )
+    if existing:
+        raise HTTPException(status_code=400, detail="Car already in cart")
+    item = models.CartItem(user_id=user.id, car_id=payload.car_id)
+    db.add(item); db.commit(); db.refresh(item)
+    return {"ok": True, "id": item.id}
+
+
+@app.delete("/api/cart/{item_id}")
+def remove_from_cart(item_id: int, user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
+    item = (
+        db.query(models.CartItem)
+        .filter(models.CartItem.id == item_id, models.CartItem.user_id == user.id)
+        .first()
+    )
+    if not item:
+        raise HTTPException(status_code=404, detail="Item not found")
+    db.delete(item); db.commit()
+    return {"ok": True}
+
+
+@app.delete("/api/cart")
+def clear_cart(user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
+    db.query(models.CartItem).filter(models.CartItem.user_id == user.id).delete()
+    db.commit()
+    return {"ok": True}
 
 
 # ==================== CONTACT INFO ====================

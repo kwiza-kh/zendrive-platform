@@ -2,15 +2,20 @@ import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { carsApi, inquiriesApi } from "../services/api";
 import { resolveImage, formatPrice } from "../utils/constants";
-import { FiZap, FiSettings, FiUsers, FiActivity, FiCalendar, FiDroplet, FiCheck, FiArrowLeft } from "react-icons/fi";
+import { FiZap, FiSettings, FiUsers, FiActivity, FiCalendar, FiDroplet, FiCheck, FiArrowLeft, FiShoppingCart } from "react-icons/fi";
+import { useCart } from "../context/CartContext";
+import { useAuth } from "../context/AuthContext";
 
 export default function CarDetail() {
   const { slug } = useParams();
+  const { user } = useAuth();
+  const { addToCart, inCart } = useCart();
   const [car, setCar] = useState(null);
   const [activeImg, setActiveImg] = useState(0);
   const [form, setForm] = useState({ name: "", email: "", phone: "", message: "" });
   const [sent, setSent] = useState(false);
   const [err, setErr] = useState("");
+  const [cartAdding, setCartAdding] = useState(false);
 
   useEffect(() => {
     carsApi.detail(slug).then((r) => { setCar(r.data); setActiveImg(0); }).catch(() => setCar(false));
@@ -116,6 +121,31 @@ export default function CarDetail() {
                 <p className="text-4xl font-bold text-ink-900">{formatPrice(car.price)}</p>
               )}
             </div>
+
+            {user && (
+              <button
+                onClick={async () => {
+                  if (inCart(car.id)) return;
+                  setCartAdding(true);
+                  try { await addToCart(car.id); } catch {}
+                  setCartAdding(false);
+                }}
+                disabled={inCart(car.id) || cartAdding}
+                className={`mt-5 w-full !py-3.5 flex items-center justify-center gap-2 font-semibold rounded-md transition-all duration-200 ${
+                  inCart(car.id)
+                    ? "bg-accent text-white cursor-default"
+                    : "btn-outline"
+                }`}
+              >
+                {inCart(car.id) ? (
+                  <><FiCheck /> Added to Cart</>
+                ) : cartAdding ? (
+                  "Adding…"
+                ) : (
+                  <><FiShoppingCart /> Add to Cart</>
+                )}
+              </button>
+            )}
 
             <div className="grid grid-cols-3 gap-2 mt-6">
               <div className="text-center bg-zen-bg rounded-lg py-3 border border-zen-line">

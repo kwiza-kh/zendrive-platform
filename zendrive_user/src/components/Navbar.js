@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
-import { FiMenu, FiX, FiUser, FiLogOut, FiSearch } from "react-icons/fi";
+import { FiMenu, FiX, FiUser, FiLogOut, FiSearch, FiShoppingCart } from "react-icons/fi";
 import { useAuth } from "../context/AuthContext";
+import { useCart } from "../context/CartContext";
 
 const links = [
   { to: "/", label: "Home" },
@@ -13,6 +14,7 @@ const links = [
 export default function Navbar() {
   const [open, setOpen] = useState(false);
   const { user, logout } = useAuth();
+  const { count } = useCart();
   const navigate = useNavigate();
 
   return (
@@ -55,12 +57,24 @@ export default function Navbar() {
           >
             <FiSearch size={18} />
           </button>
+          <Link
+            to="/cart"
+            className="relative w-10 h-10 grid place-items-center rounded-md text-ink-700 hover:bg-zen-line transition"
+            aria-label="Cart"
+          >
+            <FiShoppingCart size={18} />
+            {count > 0 && (
+              <span className="absolute -top-0.5 -right-0.5 w-5 h-5 rounded-full bg-accent text-white text-[10px] font-bold grid place-items-center">
+                {count}
+              </span>
+            )}
+          </Link>
           {user ? (
             <div className="flex items-center gap-2">
-              <div className="flex items-center gap-2 px-3 py-2 rounded-md bg-zen-line/60">
+              <Link to="/my-inquiries" className="flex items-center gap-2 px-3 py-2 rounded-md bg-zen-line/60 hover:bg-zen-line transition">
                 <FiUser className="text-ink-700" />
                 <span className="text-sm font-semibold text-ink-800">{user.name.split(" ")[0]}</span>
-              </div>
+              </Link>
               <button onClick={logout} className="btn-ghost" aria-label="Logout">
                 <FiLogOut />
               </button>
@@ -101,8 +115,14 @@ export default function Navbar() {
               </NavLink>
             ))}
             <div className="pt-3 mt-2 border-t border-zen-line flex gap-2">
+              <Link to="/cart" onClick={() => setOpen(false)} className="btn-outline flex-1 !py-2.5 relative">
+                Cart{count > 0 && ` (${count})`}
+              </Link>
               {user ? (
-                <button onClick={() => { logout(); setOpen(false); }} className="btn-outline flex-1 !py-2.5">Sign out</button>
+                <>
+                  <Link to="/my-inquiries" onClick={() => setOpen(false)} className="btn-outline flex-1 !py-2.5">My Inquiries</Link>
+                  <button onClick={() => { logout(); setOpen(false); }} className="btn-outline flex-1 !py-2.5">Sign out</button>
+                </>
               ) : (
                 <>
                   <Link to="/login" onClick={() => setOpen(false)} className="btn-outline flex-1 !py-2.5">Sign in</Link>

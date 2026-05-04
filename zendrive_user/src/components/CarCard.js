@@ -1,10 +1,25 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import { FiZap, FiSettings, FiUsers, FiActivity } from "react-icons/fi";
+import { FiZap, FiSettings, FiUsers, FiActivity, FiShoppingCart, FiCheck } from "react-icons/fi";
 import { resolveImage, formatPrice } from "../utils/constants";
+import { useCart } from "../context/CartContext";
+import { useAuth } from "../context/AuthContext";
 
 export default function CarCard({ car }) {
+  const { user } = useAuth();
+  const { addToCart, inCart } = useCart();
+  const [adding, setAdding] = useState(false);
   const hasDiscount = car.discount_price && car.discount_price < car.price;
+  const alreadyInCart = inCart(car.id);
+
+  const handleCart = async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!user || alreadyInCart) return;
+    setAdding(true);
+    try { await addToCart(car.id); } catch {}
+    setAdding(false);
+  };
   return (
     <Link to={`/cars/${car.slug}`} className="card card-hover group">
       <div className="relative h-56 bg-ink-900 overflow-hidden">
@@ -49,7 +64,23 @@ export default function CarCard({ car }) {
               <p className="text-2xl font-bold text-ink-900">{formatPrice(car.price)}</p>
             )}
           </div>
-          <span className="text-sm font-semibold text-ink-700 group-hover:text-accent transition">View →</span>
+          <div className="flex items-center gap-2">
+            {user && (
+              <button
+                onClick={handleCart}
+                disabled={alreadyInCart || adding}
+                className={`w-9 h-9 grid place-items-center rounded-md transition ${
+                  alreadyInCart
+                    ? "bg-accent text-white"
+                    : "text-ink-700 hover:bg-accent hover:text-white border border-zen-line"
+                }`}
+                aria-label={alreadyInCart ? "In cart" : "Add to cart"}
+              >
+                {alreadyInCart ? <FiCheck size={14} /> : <FiShoppingCart size={14} />}
+              </button>
+            )}
+            <span className="text-sm font-semibold text-ink-700 group-hover:text-accent transition">View →</span>
+          </div>
         </div>
       </div>
     </Link>

@@ -140,6 +140,7 @@ class InquiryCreate(BaseModel):
 
 class InquiryOut(BaseModel):
     id: int
+    user_id: Optional[int] = None
     car_id: Optional[int]
     name: str
     email: str
@@ -147,6 +148,7 @@ class InquiryOut(BaseModel):
     message: str
     status: str
     created_at: datetime
+    car: Optional[CarOut] = None
 
     class Config:
         from_attributes = True
@@ -190,7 +192,26 @@ class SocialMediaOut(BaseModel):
         from_attributes = True
 
 
+class CartItemCreate(BaseModel):
+    car_id: int
+
+
+class CartItemOut(BaseModel):
+    id: int
+    car_id: int
+    created_at: datetime
+    car: Optional[CarOut] = None
+
+    class Config:
+        from_attributes = True
+
+
 class SocialMediaUpdate(BaseModel):
     url: Optional[str] = None
     enabled: Optional[bool] = None
     sort_order: Optional[int] = None
+
+
+class CartOut(BaseModel):
+    items: List[CartItemOut]
+    total: float

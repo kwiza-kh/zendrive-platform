@@ -1,3 +1,4 @@
+from sqlalchemy import inspect, text
 from sqlalchemy.orm import Session
 from .database import Base, engine, SessionLocal
 from . import models
@@ -149,7 +150,24 @@ SAMPLE_CARS = [
 ]
 
 
+def _migrate_schema() -> None:
+    """Add missing columns/tables for existing deployments (Vercel Postgres).
+    create_all() only creates new tables — it never ALTERs existing ones."""
+    insp = inspect(engine)
+    existing_tables = insp.get_table_names()
+
+    # Add user_id to inquiries if missing
+    if "inquiries" in existing_tables:
+        cols = {c["name"] for c in insp.get_columns("inquiries")}
+        if "user_id" not in cols:
+            with engine.begin() as conn:
+                conn.execute(text(
+                    "ALTER TABLE inquiries ADD COLUMN user_id INTEGER REFERENCES users(id)"
+                ))
+
+
 def init_db() -> None:
+    _migrate_schema()
     Base.metadata.create_all(bind=engine)
     db: Session = SessionLocal()
     try:
