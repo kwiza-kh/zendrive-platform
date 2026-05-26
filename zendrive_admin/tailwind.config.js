@@ -9,8 +9,12 @@ module.exports = {
         zen: { bg: "#F8FAFC", card: "#FFFFFF", line: "#E2E8F0" },
       },
       fontFamily: {
-        sans: ["Inter", "ui-sans-serif", "system-ui", "sans-serif"],
-        display: ["Cormorant", "Georgia", "serif"],
+        sans: ["Montserrat", "ui-sans-serif", "system-ui", "sans-serif"],
+        display: ["Cormorant", "ui-serif", "Georgia", "serif"],
+      },
+      boxShadow: {
+        soft: "0 10px 28px -16px rgba(15,23,42,0.28)",
+        glow: "0 0 0 1px rgba(220,38,38,0.18), 0 16px 42px -16px rgba(220,38,38,0.35)",
       },
     },
   },

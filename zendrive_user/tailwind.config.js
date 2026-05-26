@@ -34,6 +34,25 @@ module.exports = {
         "hero-grid":
           "linear-gradient(rgba(15,23,42,0.55), rgba(15,23,42,0.65)), url('./assets/banner.png')",
       },
+      keyframes: {
+        "fade-up": {
+          "0%": { opacity: "0", transform: "translate3d(0, 18px, 0)" },
+          "100%": { opacity: "1", transform: "translate3d(0, 0, 0)" },
+        },
+        drift: {
+          "0%, 100%": { transform: "translate3d(0, 0, 0)" },
+          "50%": { transform: "translate3d(0, -8px, 0)" },
+        },
+        shimmer: {
+          "0%": { backgroundPosition: "200% 0" },
+          "100%": { backgroundPosition: "-200% 0" },
+        },
+      },
+      animation: {
+        "fade-up": "fade-up 420ms cubic-bezier(0.16, 1, 0.3, 1) both",
+        drift: "drift 10s ease-in-out infinite",
+        shimmer: "shimmer 1.45s linear infinite",
+      },
     },
   },
   plugins: [],

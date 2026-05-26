@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { FiPhone, FiMail, FiMapPin, FiClock, FiExternalLink, FiInfo } from "react-icons/fi";
 import { inquiriesApi, contactInfoApi } from "../services/api";
 
@@ -14,7 +14,7 @@ const FALLBACK = [
   { id: "f1", kind: "address", label: "Showroom", value: "120 Highline Ave, Suite 800, NY 10001", link: "https://www.google.com/maps/search/?api=1&query=120+Highline+Ave+Suite+800+NY+10001" },
   { id: "f2", kind: "phone", label: "Phone", value: "+1 (555) 936-7483", link: "tel:+15559367483" },
   { id: "f3", kind: "email", label: "Email", value: "hello@zendrive.com", link: "mailto:hello@zendrive.com" },
-  { id: "f4", kind: "hours", label: "Hours", value: "Mon–Sat: 9am – 8pm · Sun: 10am – 6pm", link: null },
+  { id: "f4", kind: "hours", label: "Hours", value: "Mon-Sat: 9am - 8pm · Sun: 10am - 6pm", link: null },
 ];
 
 const buildLink = (item) => {
@@ -25,6 +25,35 @@ const buildLink = (item) => {
   if (item.kind === "phone") return `tel:${item.value.replace(/[^+\d]/g, "")}`;
   if (item.kind === "email") return `mailto:${item.value}`;
   return null;
+};
+
+const buildMapEmbedUrl = (item) => {
+  if (!item || item.kind !== "address") return null;
+  const fallbackQuery = item.value || "";
+  const rawLink = item.link?.trim();
+
+  if (!rawLink) {
+    return `https://www.google.com/maps?q=${encodeURIComponent(fallbackQuery)}&output=embed`;
+  }
+
+  try {
+    const url = new URL(rawLink);
+    const host = url.hostname.replace(/^www\./, "");
+    const isGoogleMaps = host.includes("google.com") || host.includes("maps.google");
+
+    if (isGoogleMaps) {
+      const query =
+        url.searchParams.get("query") ||
+        url.searchParams.get("q") ||
+        url.searchParams.get("destination") ||
+        fallbackQuery;
+      return `https://www.google.com/maps?q=${encodeURIComponent(query)}&output=embed`;
+    }
+  } catch (_) {
+    // Fall back to a query-only embed URL.
+  }
+
+  return `https://www.google.com/maps?q=${encodeURIComponent(fallbackQuery)}&output=embed`;
 };
 
 export default function Contact() {
@@ -42,10 +71,22 @@ export default function Contact() {
       .catch(() => {});
   }, []);
 
+  const visibleItems = useMemo(() => (items.length > 0 ? items : FALLBACK), [items]);
+  const primaryAddress = useMemo(
+    () => visibleItems.find((it) => it.kind === "address") || FALLBACK[0],
+    [visibleItems]
+  );
+  const mapHref = buildLink(primaryAddress);
+  const mapSrc = buildMapEmbedUrl(primaryAddress);
+
   const submit = async (e) => {
     e.preventDefault();
-    try { await inquiriesApi.create(form); setSent(true); }
-    catch (e) { setErr(e?.response?.data?.detail || "Failed. Try again."); }
+    try {
+      await inquiriesApi.create(form);
+      setSent(true);
+    } catch (e2) {
+      setErr(e2?.response?.data?.detail || "Failed. Try again.");
+    }
   };
 
   return (
@@ -56,39 +97,80 @@ export default function Contact() {
         <p className="mt-4 text-ink-500">Schedule a test drive, ask about a model, or just say hi.</p>
       </div>
 
-      <div className="grid lg:grid-cols-[1fr_1.2fr] gap-10">
-        <div className="space-y-4">
-          {items.map((it) => {
-            const Icon = ICONS[it.kind] || FiInfo;
-            const href = buildLink(it);
-            const isLink = !!href;
-            return (
-              <div key={it.id} className="card p-5 flex items-start gap-4">
-                <div className="w-11 h-11 rounded-lg bg-ink-900 grid place-items-center flex-shrink-0">
-                  <Icon className="text-accent" />
+      <div className="grid lg:grid-cols-[0.95fr_1.05fr] gap-10 items-start">
+        <div className="space-y-6">
+          <div className="space-y-4">
+            {visibleItems.map((it) => {
+              const Icon = ICONS[it.kind] || FiInfo;
+              const href = buildLink(it);
+              const isLink = !!href;
+
+              return (
+                <div key={it.id} className="card p-5 flex items-start gap-4">
+                  <div className="w-11 h-11 rounded-lg bg-ink-900 grid place-items-center flex-shrink-0">
+                    <Icon className="text-accent" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-xs uppercase tracking-widest text-ink-500 font-semibold">{it.label}</p>
+                    {isLink ? (
+                      <a
+                        href={href}
+                        target={href.startsWith("http") ? "_blank" : undefined}
+                        rel="noopener noreferrer"
+                        className="font-semibold text-ink-900 mt-0.5 inline-flex items-center gap-1.5 hover:text-accent break-words"
+                      >
+                        <span className="break-words">{it.value}</span>
+                        {href.startsWith("http") && <FiExternalLink className="flex-shrink-0" />}
+                      </a>
+                    ) : (
+                      <p className="font-semibold text-ink-900 mt-0.5 break-words">{it.value}</p>
+                    )}
+                    {it.kind === "address" && isLink && (
+                      <p className="text-xs text-ink-500 mt-1">Click to open in maps</p>
+                    )}
+                  </div>
                 </div>
-                <div className="min-w-0 flex-1">
-                  <p className="text-xs uppercase tracking-widest text-ink-500 font-semibold">{it.label}</p>
-                  {isLink ? (
-                    <a
-                      href={href}
-                      target={href.startsWith("http") ? "_blank" : undefined}
-                      rel="noopener noreferrer"
-                      className="font-semibold text-ink-900 mt-0.5 inline-flex items-center gap-1.5 hover:text-accent break-words"
-                    >
-                      <span className="break-words">{it.value}</span>
-                      {href.startsWith("http") && <FiExternalLink className="flex-shrink-0" />}
-                    </a>
-                  ) : (
-                    <p className="font-semibold text-ink-900 mt-0.5 break-words">{it.value}</p>
-                  )}
-                  {it.kind === "address" && isLink && (
-                    <p className="text-xs text-ink-500 mt-1">Click to open in maps</p>
-                  )}
-                </div>
+              );
+            })}
+          </div>
+
+          <div className="card overflow-hidden">
+            <div className="flex items-start justify-between gap-4 p-5 md:p-6 border-b border-zen-line">
+              <div>
+                <p className="section-eyebrow">Visit us</p>
+                <h2 className="font-display text-2xl md:text-3xl text-ink-900">Showroom map</h2>
+                <p className="mt-2 text-sm text-ink-500 break-words">
+                  {primaryAddress.label}: {primaryAddress.value}
+                </p>
               </div>
-            );
-          })}
+              {mapHref && (
+                <a
+                  href={mapHref}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn-outline !px-4 !py-2 text-sm whitespace-nowrap"
+                >
+                  Open in Maps
+                </a>
+              )}
+            </div>
+            <div className="relative bg-zen-bg">
+              {mapSrc ? (
+                <iframe
+                  title="Zendrive showroom map"
+                  src={mapSrc}
+                  className="block w-full h-[320px] md:h-[420px] border-0"
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                  allowFullScreen
+                />
+              ) : (
+                <div className="h-[320px] md:h-[420px] grid place-items-center p-8 text-center text-ink-500">
+                  Map preview is unavailable.
+                </div>
+              )}
+            </div>
+          </div>
         </div>
 
         <form onSubmit={submit} className="card p-8 space-y-4">
@@ -101,11 +183,23 @@ export default function Contact() {
           ) : (
             <>
               <div className="grid sm:grid-cols-2 gap-4">
-                <div><label className="label">Name</label><input className="input" required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} /></div>
-                <div><label className="label">Email</label><input className="input" type="email" required value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} /></div>
+                <div>
+                  <label className="label">Name</label>
+                  <input className="input" required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
+                </div>
+                <div>
+                  <label className="label">Email</label>
+                  <input className="input" type="email" required value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
+                </div>
               </div>
-              <div><label className="label">Phone</label><input className="input" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} /></div>
-              <div><label className="label">Message</label><textarea className="input min-h-[140px] resize-none" value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })} /></div>
+              <div>
+                <label className="label">Phone</label>
+                <input className="input" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
+              </div>
+              <div>
+                <label className="label">Message</label>
+                <textarea className="input min-h-[140px] resize-none" value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })} />
+              </div>
               {err && <p className="text-accent text-sm">{err}</p>}
               <button className="btn-primary w-full !py-3.5">Send message</button>
             </>

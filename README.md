@@ -100,6 +100,24 @@ cp data/db/zendrive.db data/db/zendrive.db.bak
 
 Open **3 terminals**.
 
+### One-command start
+
+From the repository root, you can start backend, user, and admin together with:
+
+```bash
+npm run dev
+```
+
+On Windows PowerShell, if `npm` is blocked by the `npm.ps1` execution policy, use:
+
+```powershell
+npm.cmd run dev
+# or
+cmd /c npm run dev
+```
+
+This delegates to `dev.ps1 start -Service all`.
+
 ### 1) Backend — `http://localhost:8000`
 
 ```powershell

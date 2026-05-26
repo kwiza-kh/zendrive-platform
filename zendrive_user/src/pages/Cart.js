@@ -15,13 +15,13 @@ export default function Cart() {
 
   if (!user) {
     return (
-      <div className="container-zen py-24 text-center">
-        <div className="w-20 h-20 mx-auto rounded-full bg-ink-900 grid place-items-center mb-6">
+      <div className="container-zen py-24 text-center page-enter">
+        <div className="w-20 h-20 mx-auto rounded-full bg-ink-900 grid place-items-center mb-6 shadow-soft">
           <FiShoppingCart className="text-accent" size={32} />
         </div>
         <h2 className="section-title mb-3">Sign in to view your cart</h2>
         <p className="text-ink-500 mb-8">Save cars you love and submit inquiries all at once.</p>
-        <div className="flex justify-center gap-3">
+        <div className="flex justify-center gap-3 flex-wrap">
           <Link to="/login" className="btn-primary">Sign in</Link>
           <Link to="/register" className="btn-outline">Create account</Link>
         </div>
@@ -31,8 +31,8 @@ export default function Cart() {
 
   if (sent) {
     return (
-      <div className="container-zen py-24 text-center">
-        <div className="w-20 h-20 mx-auto rounded-full bg-accent grid place-items-center mb-6">
+      <div className="container-zen py-24 text-center page-enter">
+        <div className="w-20 h-20 mx-auto rounded-full bg-accent grid place-items-center mb-6 shadow-glow">
           <FiCheck className="text-white" size={32} />
         </div>
         <h2 className="section-title mb-3">Inquiry submitted!</h2>
@@ -43,7 +43,8 @@ export default function Cart() {
   }
 
   const submitInquiry = async () => {
-    setSubmitting(true); setErr("");
+    setSubmitting(true);
+    setErr("");
     try {
       const carNames = items.map((i) => i.car?.name).filter(Boolean).join(", ");
       await inquiriesApi.create({
@@ -64,8 +65,8 @@ export default function Cart() {
     car.discount_price && car.discount_price < car.price ? car.discount_price : car.price;
 
   return (
-    <div className="container-zen py-12">
-      <Link to="/cars" className="inline-flex items-center gap-2 text-sm font-semibold text-ink-700 hover:text-accent mb-8">
+    <div className="container-zen py-12 page-enter">
+      <Link to="/cars" className="inline-flex items-center gap-2 text-sm font-semibold text-ink-700 hover:text-accent mb-8 transition-colors duration-200">
         <FiArrowLeft /> Continue browsing
       </Link>
 
@@ -75,7 +76,13 @@ export default function Cart() {
       </div>
 
       {loading ? (
-        <div className="text-ink-500">Loading…</div>
+        <div className="card p-8">
+          <div className="h-5 w-40 skeleton rounded-full" />
+          <div className="mt-6 space-y-4">
+            <div className="h-28 skeleton rounded-2xl" />
+            <div className="h-28 skeleton rounded-2xl" />
+          </div>
+        </div>
       ) : items.length === 0 ? (
         <div className="card p-16 text-center">
           <div className="w-16 h-16 mx-auto rounded-full bg-zen-line grid place-items-center mb-5">
@@ -88,31 +95,31 @@ export default function Cart() {
       ) : (
         <div className="grid lg:grid-cols-[1fr_380px] gap-8">
           <div className="space-y-4">
-            {items.map((item) => {
+            {items.map((item, index) => {
               const car = item.car;
               if (!car) return null;
               return (
-                <div key={item.id} className="card p-5 flex gap-5">
-                  <Link to={`/cars/${car.slug}`} className="flex-shrink-0 w-48 h-32 rounded-lg overflow-hidden bg-ink-900">
+                <div key={item.id} className="card p-5 flex gap-4 sm:gap-5 card-hover page-enter" style={{ animationDelay: `${index * 60}ms` }}>
+                  <Link to={`/cars/${car.slug}`} className="flex-shrink-0 w-24 h-16 sm:w-48 sm:h-32 rounded-2xl overflow-hidden bg-ink-900">
                     <img src={resolveImage(car.image)} alt={car.name} className="w-full h-full object-cover" />
                   </Link>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-start justify-between gap-3">
                       <div>
                         <p className="text-xs uppercase tracking-widest text-ink-500 font-semibold">{car.brand?.name || "Zendrive"}</p>
-                        <Link to={`/cars/${car.slug}`} className="font-display text-2xl text-ink-900 hover:text-accent transition leading-tight">
+                        <Link to={`/cars/${car.slug}`} className="font-display text-2xl text-ink-900 hover:text-accent transition-colors duration-200 leading-tight">
                           {car.name}
                         </Link>
                       </div>
                       <button
                         onClick={() => removeFromCart(item.id)}
-                        className="w-9 h-9 grid place-items-center rounded-md text-ink-500 hover:text-accent hover:bg-accent/10 transition"
+                        className="w-9 h-9 grid place-items-center rounded-full text-ink-500 hover:text-accent hover:bg-accent/10 transition-all duration-200"
                         aria-label="Remove"
                       >
                         <FiTrash2 size={16} />
                       </button>
                     </div>
-                    <div className="flex items-center gap-4 mt-2 text-xs text-ink-500">
+                    <div className="flex items-center gap-4 mt-2 text-xs text-ink-500 flex-wrap">
                       <span>{car.year}</span>
                       <span>{car.fuel_type}</span>
                       <span>{car.transmission}</span>
@@ -150,7 +157,7 @@ export default function Cart() {
                 disabled={submitting}
                 className="btn-primary w-full !py-3.5"
               >
-                {submitting ? "Submitting…" : "Submit Inquiry"}
+                {submitting ? "Submitting..." : "Submit Inquiry"}
               </button>
               <p className="text-xs text-ink-500 text-center">A specialist will reach out within 30 minutes.</p>
             </div>

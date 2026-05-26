@@ -5,14 +5,14 @@ import { FiTruck, FiTag, FiMessageSquare, FiDollarSign, FiArrowRight, FiArrowUpR
 
 function StatCard({ icon: Icon, label, value, to, color = "bg-ink-900" }) {
   return (
-    <Link to={to} className="card p-5 hover:shadow-md transition-shadow group">
+    <Link to={to} className="card card-hover p-5 group">
       <div className="flex items-start justify-between mb-4">
-        <div className={`w-10 h-10 rounded-lg ${color} grid place-items-center`}>
+        <div className={`w-10 h-10 rounded-xl ${color} grid place-items-center shadow-soft`}>
           <Icon size={18} className="text-accent" />
         </div>
         <FiArrowUpRight
           size={16}
-          className="text-ink-300 group-hover:text-accent transition-colors"
+          className="text-ink-300 group-hover:text-accent transition-colors duration-200"
         />
       </div>
       <p className="text-xs uppercase tracking-widest text-ink-500 font-semibold">{label}</p>
@@ -44,20 +44,19 @@ export default function Dashboard() {
 
   return (
     <div className="page-content">
-      {/* Stats */}
       <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        {stats.map((s) => (
-          <StatCard key={s.label} {...s} />
+        {stats.map((s, index) => (
+          <div key={s.label} className="page-enter" style={{ animationDelay: `${index * 80}ms` }}>
+            <StatCard {...s} />
+          </div>
         ))}
       </div>
 
-      {/* Tables */}
       <div className="grid lg:grid-cols-2 gap-6">
-        {/* Latest Cars */}
         <div className="card flex flex-col">
           <div className="flex items-center justify-between px-5 pt-5 pb-4 border-b border-zen-line">
             <h2 className="font-semibold text-sm">Latest Cars</h2>
-            <Link to="/cars" className="text-xs font-semibold text-accent hover:text-accent-dark flex items-center gap-1">
+            <Link to="/cars" className="text-xs font-semibold text-accent hover:text-accent-dark flex items-center gap-1 transition-colors duration-200">
               Manage <FiArrowRight size={12} />
             </Link>
           </div>
@@ -79,11 +78,10 @@ export default function Dashboard() {
           </ul>
         </div>
 
-        {/* Recent Inquiries */}
         <div className="card flex flex-col">
           <div className="flex items-center justify-between px-5 pt-5 pb-4 border-b border-zen-line">
             <h2 className="font-semibold text-sm">Recent Inquiries</h2>
-            <Link to="/inquiries" className="text-xs font-semibold text-accent hover:text-accent-dark flex items-center gap-1">
+            <Link to="/inquiries" className="text-xs font-semibold text-accent hover:text-accent-dark flex items-center gap-1 transition-colors duration-200">
               View all <FiArrowRight size={12} />
             </Link>
           </div>

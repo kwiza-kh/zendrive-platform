@@ -2,17 +2,19 @@ import React, { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { carsApi, brandsApi, bodyTypesApi } from "../services/api";
 import CarCard from "../components/CarCard";
-import { FiSearch, FiX } from "react-icons/fi";
+import { FiSearch, FiX, FiSliders } from "react-icons/fi";
 
 const FUEL_TYPES = ["Electric", "Hybrid", "Gasoline", "Diesel"];
 
 export default function Cars() {
   const [params, setParams] = useSearchParams();
+  const urlQ = params.get("q") || "";
   const [cars, setCars] = useState([]);
   const [brands, setBrands] = useState([]);
   const [bodyTypes, setBodyTypes] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [q, setQ] = useState(params.get("q") || "");
+  const [q, setQ] = useState(urlQ);
+  const [showFilters, setShowFilters] = useState(false);
 
   const filters = {
     q: params.get("q") || undefined,
@@ -23,52 +25,74 @@ export default function Cars() {
   };
 
   useEffect(() => {
-    brandsApi.list().then((r) => setBrands(r.data));
-    bodyTypesApi.list().then((r) => setBodyTypes(r.data.map((b) => b.name)));
+    let cancelled = false;
+    brandsApi.list().then((r) => { if (!cancelled) setBrands(r.data); }).catch(() => {});
+    bodyTypesApi.list().then((r) => { if (!cancelled) setBodyTypes(r.data.map((b) => b.name)); }).catch(() => {});
+    return () => { cancelled = true; };
   }, []);
 
   useEffect(() => {
+    setQ(urlQ);
+  }, [urlQ]);
+
+  useEffect(() => {
     setLoading(true);
-    carsApi.list(filters).then((r) => { setCars(r.data); setLoading(false); });
-    // eslint-disable-next-line
+    let cancelled = false;
+    carsApi.list(filters)
+      .then((r) => { if (!cancelled) setCars(r.data); })
+      .catch(() => { if (!cancelled) setCars([]); })
+      .finally(() => { if (!cancelled) setLoading(false); });
+    return () => { cancelled = true; };
   }, [params]);
 
   const setFilter = (k, v) => {
     const next = new URLSearchParams(params);
-    if (v) next.set(k, v); else next.delete(k);
+    if (v) next.set(k, v);
+    else next.delete(k);
     setParams(next);
   };
 
-  const clearAll = () => setParams({});
+  const clearAll = () => {
+    setQ("");
+    setShowFilters(false);
+    setParams({});
+  };
+
   const activeCount = [...params.keys()].filter((k) => k !== "sort").length;
 
   return (
-    <div className="container-zen py-12">
+    <div className="container-zen py-12 page-enter">
       <div className="mb-8">
         <p className="section-eyebrow">Inventory</p>
         <h1 className="section-title">Find your Zendrive.</h1>
       </div>
 
-      {/* Search bar */}
-      <form
-        onSubmit={(e) => { e.preventDefault(); setFilter("q", q); }}
-        className="flex gap-2 mb-6"
-      >
+      <form onSubmit={(e) => { e.preventDefault(); setFilter("q", q); }} className="flex gap-2 mb-6">
         <div className="relative flex-1">
           <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-ink-500" />
           <input
             value={q}
             onChange={(e) => setQ(e.target.value)}
-            placeholder="Search by name, model, or keyword…"
+            placeholder="Search by name, model, or keyword..."
             className="input pl-11"
           />
         </div>
         <button className="btn-primary !px-7">Search</button>
       </form>
 
+      <div className="lg:hidden mb-4">
+        <button
+          onClick={() => setShowFilters(!showFilters)}
+          className="btn-outline w-full flex items-center justify-center gap-2"
+        >
+          <FiSliders size={16} />
+          {showFilters ? "Hide Filters" : "Show Filters"}
+          {activeCount > 0 && <span className="badge-accent ml-2">{activeCount}</span>}
+        </button>
+      </div>
+
       <div className="grid lg:grid-cols-[260px_1fr] gap-8">
-        {/* Filters */}
-        <aside className="card p-6 h-fit sticky top-24">
+        <aside className={`card p-6 h-fit lg:sticky lg:top-24 transition-all duration-200 ${showFilters ? "block page-enter" : "hidden lg:block"}`}>
           <div className="flex items-center justify-between mb-5">
             <h3 className="font-bold text-ink-900">Filters</h3>
             {activeCount > 0 && (
@@ -126,13 +150,12 @@ export default function Cars() {
           </div>
         </aside>
 
-        {/* Results */}
         <section>
-          <p className="text-sm text-ink-500 mb-4">{loading ? "Loading…" : `${cars.length} vehicles found`}</p>
+          <p className="text-sm text-ink-500 mb-4">{loading ? "Loading..." : `${cars.length} vehicles found`}</p>
           {loading ? (
             <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-6">
               {Array.from({ length: 6 }).map((_, i) => (
-                <div key={i} className="card h-96 animate-pulse bg-zen-line/40" />
+                <div key={i} className="card h-96 skeleton" />
               ))}
             </div>
           ) : cars.length === 0 ? (

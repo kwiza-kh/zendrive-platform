@@ -1,0 +1,12 @@
+{
+  "name": "zendrive-platform",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "powershell -NoProfile -ExecutionPolicy Bypass -File .\\dev.ps1 start -Service all",
+    "dev:fg": "powershell -NoProfile -ExecutionPolicy Bypass -File .\\dev.ps1 start -Service all -Foreground",
+    "dev:install": "powershell -NoProfile -ExecutionPolicy Bypass -File .\\dev.ps1 install -Service all",
+    "dev:status": "powershell -NoProfile -ExecutionPolicy Bypass -File .\\dev.ps1 status -Output json",
+    "dev:stop": "powershell -NoProfile -ExecutionPolicy Bypass -File .\\dev.ps1 stop -Service all -Yes"
+  }
+}

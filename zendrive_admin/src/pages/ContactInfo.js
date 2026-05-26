@@ -170,9 +170,9 @@ export default function ContactInfo() {
       <div className="page-header">
         <h1 className="page-title">Contact Info</h1>
         <p className="page-subtitle">
-          Manage the contact details shown on the public Contact page. For
-          addresses, set a link to open Google Maps (or any map service) when
-          users click.
+          Manage every public contact entry shown on the website, including
+          showroom address, phone, email, hours, and the map link used on the
+          Contact page.
         </p>
       </div>
 
@@ -182,6 +182,13 @@ export default function ContactInfo() {
           setData={setForm}
           isAddress={form.kind === "address"}
         />
+        {form.kind === "address" && (
+          <p className="text-xs text-ink-500">
+            Leave the map link empty to auto-generate one from the address, or
+            paste any Google Maps / map service URL you want the public page to
+            use.
+          </p>
+        )}
         <div className="flex justify-end">
           <button className="btn-primary">
             <FiPlus /> Add entry

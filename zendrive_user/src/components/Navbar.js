@@ -18,15 +18,15 @@ export default function Navbar() {
   const navigate = useNavigate();
 
   return (
-    <header className="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-zen-line">
+    <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-white/60 shadow-[0_10px_30px_-26px_rgba(15,23,42,0.28)]">
       <div className="container-zen flex items-center justify-between h-20">
         <Link to="/" className="flex items-center gap-2 group">
           <img
             src="/logo.png"
             alt="Zendrive"
-            className="w-10 h-10 rounded-lg object-cover shadow-soft group-hover:scale-105 transition"
+            className="w-10 h-10 rounded-xl object-cover shadow-soft group-hover:scale-105 transition duration-200"
           />
-          <div className="font-sans font-extrabold tracking-tight text-xl">
+          <div className="font-extrabold tracking-tight text-xl">
             <span className="text-ink-900">ZEN</span>
             <span className="text-accent">DRIVE</span>
           </div>
@@ -38,8 +38,10 @@ export default function Navbar() {
               key={l.to}
               to={l.to}
               className={({ isActive }) =>
-                `px-4 py-2 text-sm font-semibold rounded-md transition ${
-                  isActive ? "text-accent" : "text-ink-700 hover:text-accent"
+                `px-4 py-2 text-sm font-semibold rounded-full transition-all duration-200 ${
+                  isActive
+                    ? "text-accent bg-accent/10 shadow-[0_0_0_1px_rgba(220,38,38,0.12)]"
+                    : "text-ink-700 hover:text-accent hover:bg-white"
                 }`
               }
               end={l.to === "/"}
@@ -52,14 +54,14 @@ export default function Navbar() {
         <div className="hidden md:flex items-center gap-3">
           <button
             onClick={() => navigate("/cars")}
-            className="w-10 h-10 grid place-items-center rounded-md text-ink-700 hover:bg-zen-line transition"
+            className="w-10 h-10 grid place-items-center rounded-full text-ink-700 hover:bg-white hover:text-accent transition-all duration-200 hover:shadow-soft"
             aria-label="Search"
           >
             <FiSearch size={18} />
           </button>
           <Link
             to="/cart"
-            className="relative w-10 h-10 grid place-items-center rounded-md text-ink-700 hover:bg-zen-line transition"
+            className="relative w-10 h-10 grid place-items-center rounded-full text-ink-700 hover:bg-white hover:text-accent transition-all duration-200 hover:shadow-soft"
             aria-label="Cart"
           >
             <FiShoppingCart size={18} />
@@ -71,7 +73,7 @@ export default function Navbar() {
           </Link>
           {user ? (
             <div className="flex items-center gap-2">
-              <Link to="/my-inquiries" className="flex items-center gap-2 px-3 py-2 rounded-md bg-zen-line/60 hover:bg-zen-line transition">
+              <Link to="/my-inquiries" className="flex items-center gap-2 px-3 py-2 rounded-full bg-white border border-zen-line hover:border-ink-900/10 hover:shadow-soft transition-all duration-200">
                 <FiUser className="text-ink-700" />
                 <span className="text-sm font-semibold text-ink-800">{user.name.split(" ")[0]}</span>
               </Link>
@@ -88,7 +90,7 @@ export default function Navbar() {
         </div>
 
         <button
-          className="md:hidden w-10 h-10 grid place-items-center rounded-md text-ink-900 hover:bg-zen-line transition"
+          className="md:hidden w-10 h-10 grid place-items-center rounded-full text-ink-900 hover:bg-white hover:text-accent transition-all duration-200 hover:shadow-soft"
           onClick={() => setOpen((o) => !o)}
           aria-label="Menu"
         >
@@ -97,16 +99,16 @@ export default function Navbar() {
       </div>
 
       {open && (
-        <div className="md:hidden border-t border-zen-line bg-white">
-          <div className="container-zen py-4 flex flex-col gap-1">
+        <div className="md:hidden border-t border-white/70 bg-white/95 backdrop-blur-xl">
+          <div className="container-zen py-4 flex flex-col gap-1 animate-fade-up">
             {links.map((l) => (
               <NavLink
                 key={l.to}
                 to={l.to}
                 onClick={() => setOpen(false)}
                 className={({ isActive }) =>
-                  `px-3 py-2 rounded-md text-sm font-semibold ${
-                    isActive ? "bg-accent text-white" : "text-ink-800 hover:bg-zen-line"
+                  `px-3 py-2 rounded-full text-sm font-semibold transition-all duration-200 ${
+                    isActive ? "bg-accent text-white shadow-soft" : "text-ink-800 hover:bg-zen-line"
                   }`
                 }
                 end={l.to === "/"}

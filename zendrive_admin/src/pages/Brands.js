@@ -28,41 +28,45 @@ function LogoUpload({ value, onChange, disabled }) {
   };
 
   return (
-    <div className="flex items-center gap-3">
-      <div className="w-12 h-12 rounded-lg border border-zen-line bg-zen-bg overflow-hidden grid place-items-center flex-shrink-0">
-        {value ? (
-          <img src={resolveImage(value)} alt="" className="w-full h-full object-cover" />
-        ) : (
-          <span className="text-[10px] text-ink-500">No logo</span>
-        )}
+    <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+      <div className="flex items-center gap-3 flex-1 min-w-0">
+        <div className="w-12 h-12 rounded-lg border border-zen-line bg-zen-bg overflow-hidden grid place-items-center flex-shrink-0">
+          {value ? (
+            <img src={resolveImage(value)} alt="" className="w-full h-full object-cover" />
+          ) : (
+            <span className="text-[10px] text-ink-500">No logo</span>
+          )}
+        </div>
+        <input
+          className="input flex-1 min-w-0"
+          placeholder="Logo URL or upload →"
+          value={value || ""}
+          onChange={(e) => onChange(e.target.value)}
+          disabled={disabled || busy}
+        />
       </div>
-      <input
-        className="input flex-1"
-        placeholder="Logo URL or upload →"
-        value={value || ""}
-        onChange={(e) => onChange(e.target.value)}
-        disabled={disabled || busy}
-      />
-      <button
-        type="button"
-        onClick={pick}
-        className="btn-outline !px-3 whitespace-nowrap"
-        disabled={disabled || busy}
-        title="Upload image"
-      >
-        {busy ? <FiLoader className="animate-spin" /> : <FiUpload />}
-      </button>
-      {value && (
+      <div className="flex items-center gap-2">
         <button
           type="button"
-          onClick={() => onChange("")}
-          className="btn-outline !px-3"
+          onClick={pick}
+          className="btn-outline !px-3 whitespace-nowrap"
           disabled={disabled || busy}
-          title="Clear logo"
+          title="Upload image"
         >
-          <FiX />
+          {busy ? <FiLoader className="animate-spin" /> : <FiUpload />}
         </button>
-      )}
+        {value && (
+          <button
+            type="button"
+            onClick={() => onChange("")}
+            className="btn-outline !px-3"
+            disabled={disabled || busy}
+            title="Clear logo"
+          >
+            <FiX />
+          </button>
+        )}
+      </div>
       <input
         ref={inputRef}
         type="file"
@@ -70,7 +74,7 @@ function LogoUpload({ value, onChange, disabled }) {
         className="hidden"
         onChange={handle}
       />
-      {err && <p className="text-accent text-xs ml-2">{err}</p>}
+      {err && <p className="text-accent text-xs">{err}</p>}
     </div>
   );
 }

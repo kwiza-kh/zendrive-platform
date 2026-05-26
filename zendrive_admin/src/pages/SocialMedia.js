@@ -7,26 +7,27 @@ import {
 import { FaWhatsapp, FaTiktok, FaTelegramPlane } from "react-icons/fa";
 
 const PLATFORM_META = {
-  instagram: { label: "Instagram",  Icon: FiInstagram,       color: "from-purple-500 to-pink-500",   placeholder: "https://instagram.com/yourpage" },
-  facebook:  { label: "Facebook",   Icon: FiFacebook,        color: "from-blue-600 to-blue-500",     placeholder: "https://facebook.com/yourpage" },
-  twitter:   { label: "Twitter / X",Icon: FiTwitter,         color: "from-sky-500 to-sky-400",       placeholder: "https://twitter.com/yourpage" },
-  youtube:   { label: "YouTube",    Icon: FiYoutube,         color: "from-red-600 to-red-500",       placeholder: "https://youtube.com/@yourchannel" },
-  linkedin:  { label: "LinkedIn",   Icon: FiLinkedin,        color: "from-blue-700 to-blue-600",     placeholder: "https://linkedin.com/company/yourpage" },
-  tiktok:    { label: "TikTok",     Icon: FaTiktok,          color: "from-zinc-900 to-zinc-700",     placeholder: "https://tiktok.com/@yourpage" },
-  telegram:  { label: "Telegram",   Icon: FaTelegramPlane,   color: "from-cyan-500 to-cyan-400",     placeholder: "https://t.me/yourchannel" },
-  whatsapp:  { label: "WhatsApp",   Icon: FaWhatsapp,        color: "from-green-500 to-green-400",   placeholder: "https://wa.me/15559367483" },
+  instagram: { label: "Instagram", Icon: FiInstagram, color: "from-purple-500 to-pink-500", placeholder: "https://instagram.com/yourpage" },
+  facebook: { label: "Facebook", Icon: FiFacebook, color: "from-blue-600 to-blue-500", placeholder: "https://facebook.com/yourpage" },
+  twitter: { label: "Twitter / X", Icon: FiTwitter, color: "from-sky-500 to-sky-400", placeholder: "https://twitter.com/yourpage" },
+  youtube: { label: "YouTube", Icon: FiYoutube, color: "from-red-600 to-red-500", placeholder: "https://youtube.com/@yourchannel" },
+  linkedin: { label: "LinkedIn", Icon: FiLinkedin, color: "from-blue-700 to-blue-600", placeholder: "https://linkedin.com/company/yourpage" },
+  tiktok: { label: "TikTok", Icon: FaTiktok, color: "from-zinc-900 to-zinc-700", placeholder: "https://tiktok.com/@yourpage" },
+  telegram: { label: "Telegram", Icon: FaTelegramPlane, color: "from-cyan-500 to-cyan-400", placeholder: "https://t.me/yourchannel" },
+  whatsapp: { label: "WhatsApp", Icon: FaWhatsapp, color: "from-green-500 to-green-400", placeholder: "https://wa.me/15559367483" },
 };
 
-function Toggle({ checked, onChange }) {
+function Toggle({ checked, onChange, disabled }) {
   return (
     <button
       type="button"
       role="switch"
       aria-checked={checked}
+      disabled={disabled}
       onClick={() => onChange(!checked)}
-      className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 focus:outline-none ${
-        checked ? "bg-accent" : "bg-zen-line"
-      }`}
+      className={`relative inline-flex h-6 w-11 flex-shrink-0 rounded-full border-2 border-transparent transition-colors duration-200 focus:outline-none ${
+        disabled ? "cursor-not-allowed opacity-60" : "cursor-pointer"
+      } ${checked ? "bg-accent" : "bg-zen-line"}`}
     >
       <span
         className={`pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow transform transition-transform duration-200 ${
@@ -39,7 +40,7 @@ function Toggle({ checked, onChange }) {
 
 export default function SocialMedia() {
   const [items, setItems] = useState([]);
-  const [dirty, setDirty] = useState({});   // platform -> { url?, enabled? }
+  const [dirty, setDirty] = useState({});
   const [saving, setSaving] = useState(null);
   const [err, setErr] = useState("");
   const [saved, setSaved] = useState(null);
@@ -64,15 +65,38 @@ export default function SocialMedia() {
       ? dirty[item.platform][key]
       : item[key];
 
+  const buildPayload = (item) => {
+    const changes = dirty[item.platform] || {};
+    return {
+      url: getVal(item, "url"),
+      enabled: getVal(item, "enabled"),
+      sort_order: getVal(item, "sort_order"),
+      ...changes,
+    };
+  };
+
   const save = async (platform) => {
+    const item = items.find((entry) => entry.platform === platform);
     const changes = dirty[platform];
-    if (!changes) return;
-    setSaving(platform); setErr("");
+    if (!changes || !item) return;
+
+    const payload = buildPayload(item);
+    setSaving(platform);
+    setErr("");
     try {
-      await api.put(`/api/social-media/${platform}`, changes);
-      await load();
+      await api.put(`/api/social-media/${platform}`, payload);
+      setDirty((current) => {
+        const next = { ...current };
+        delete next[platform];
+        return next;
+      });
+      setItems((current) =>
+        current.map((entry) =>
+          entry.platform === platform ? { ...entry, ...payload } : entry
+        )
+      );
       setSaved(platform);
-      setTimeout(() => setSaved((p) => (p === platform ? null : p)), 2000);
+      setTimeout(() => setSaved((p) => (p === platform ? null : p)), 1800);
     } catch (e) {
       setErr(e?.response?.data?.detail || "Save failed.");
     } finally {
@@ -87,19 +111,24 @@ export default function SocialMedia() {
       <div className="page-header">
         <h1 className="page-title">Social Media</h1>
         <p className="page-subtitle">
-          Enable platforms and set links — only enabled platforms appear on the website footer.
+          Enable platforms and set links. Only enabled platforms appear on the website footer.
         </p>
       </div>
 
       {err && (
-        <div className="mb-5 flex items-center gap-2 text-sm text-accent bg-red-50 border border-red-200 rounded-lg px-4 py-3">
+        <div className="mb-5 flex items-center gap-2 text-sm text-accent bg-red-50 border border-red-200 rounded-2xl px-4 py-3">
           <FiAlertCircle size={15} className="flex-shrink-0" /> {err}
         </div>
       )}
 
       <div className="space-y-3">
-        {items.map((item) => {
-          const meta = PLATFORM_META[item.platform] || { label: item.platform, Icon: FiExternalLink, color: "from-ink-700 to-ink-600", placeholder: "https://" };
+        {items.map((item, index) => {
+          const meta = PLATFORM_META[item.platform] || {
+            label: item.platform,
+            Icon: FiExternalLink,
+            color: "from-ink-700 to-ink-600",
+            placeholder: "https://",
+          };
           const { label, Icon, color, placeholder } = meta;
           const enabled = getVal(item, "enabled");
           const url = getVal(item, "url");
@@ -110,55 +139,58 @@ export default function SocialMedia() {
           return (
             <div
               key={item.platform}
-              className={`card p-4 transition-all ${enabled ? "ring-1 ring-accent/20" : ""}`}
+              className={`card p-4 transition-all duration-200 page-enter ${enabled ? "ring-1 ring-accent/20" : ""}`}
+              style={{ animationDelay: `${index * 60}ms` }}
             >
-              <div className="flex items-center gap-4">
-                {/* Platform icon */}
-                <div className={`w-11 h-11 rounded-xl bg-gradient-to-br ${color} grid place-items-center flex-shrink-0`}>
-                  <Icon size={18} className="text-white" />
-                </div>
+              <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+                <div className="flex items-center gap-4 flex-1 min-w-0">
+                  <div className={`w-11 h-11 rounded-2xl bg-gradient-to-br ${color} grid place-items-center flex-shrink-0 shadow-soft`}>
+                    <Icon size={18} className="text-white" />
+                  </div>
 
-                {/* Label + toggle */}
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center justify-between gap-3 mb-2">
-                    <span className="font-semibold text-sm">{label}</span>
-                    <div className="flex items-center gap-2">
-                      <span className={`text-xs font-medium ${enabled ? "text-accent" : "text-ink-500"}`}>
-                        {enabled ? "Enabled" : "Disabled"}
-                      </span>
-                      <Toggle
-                        checked={enabled}
-                        onChange={(v) => patch(item.platform, "enabled", v)}
-                      />
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between gap-3 mb-2">
+                      <span className="font-semibold text-sm">{label}</span>
+                      <div className="flex items-center gap-2">
+                        <span className={`text-xs font-medium ${enabled ? "text-accent" : "text-ink-500"}`}>
+                          {enabled ? "Enabled" : "Disabled"}
+                        </span>
+                        <Toggle
+                          checked={enabled}
+                          disabled={isSaving}
+                          onChange={(v) => patch(item.platform, "enabled", v)}
+                        />
+                      </div>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <input
-                      className="input flex-1 text-sm"
-                      placeholder={placeholder}
-                      value={url}
-                      onChange={(e) => patch(item.platform, "url", e.target.value)}
-                    />
-                    {url && (
-                      <a
-                        href={url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="btn-outline !px-2.5 !py-2 flex-shrink-0"
-                        title="Open link"
-                      >
-                        <FiExternalLink size={14} />
-                      </a>
-                    )}
-                  </div>
+                </div>
+
+                <div className="flex items-center gap-2 sm:w-64">
+                  <input
+                    className="input flex-1 text-sm min-w-0"
+                    placeholder={placeholder}
+                    value={url}
+                    disabled={isSaving}
+                    onChange={(e) => patch(item.platform, "url", e.target.value)}
+                  />
+                  {url && (
+                    <a
+                      href={url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="btn-outline !px-2.5 !py-2 flex-shrink-0"
+                      title="Open link"
+                    >
+                      <FiExternalLink size={14} />
+                    </a>
+                  )}
                 </div>
               </div>
 
-              {/* Save button - appears when dirty */}
               {(isDirty || isSaved) && (
                 <div className="mt-3 flex items-center justify-end gap-2 border-t border-zen-line pt-3">
                   {isSaved && (
-                    <span className="text-xs text-emerald-600 font-semibold">Saved ✓</span>
+                    <span className="text-xs text-emerald-600 font-semibold">Saved</span>
                   )}
                   {isDirty && (
                     <button
@@ -166,7 +198,7 @@ export default function SocialMedia() {
                       disabled={isSaving}
                       className="btn-primary !py-1.5 !text-xs"
                     >
-                      {isSaving ? "Saving…" : "Save changes"}
+                      {isSaving ? "Saving..." : "Save changes"}
                     </button>
                   )}
                 </div>

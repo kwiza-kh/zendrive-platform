@@ -9,15 +9,24 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
 
   const submit = async (e) => {
-    e.preventDefault(); setErr(""); setLoading(true);
+    e.preventDefault();
+    setErr("");
+    setLoading(true);
     try {
       const { data } = await api.post("/api/auth/login", form);
-      if (!data.user.is_admin) { setErr("This account is not an admin."); setLoading(false); return; }
+      if (!data.user.is_admin) {
+        setErr("This account is not an admin.");
+        setLoading(false);
+        return;
+      }
       localStorage.setItem("admin_token", data.access_token);
       localStorage.setItem("admin_user", JSON.stringify(data.user));
       nav("/");
-    } catch (e) { setErr(e?.response?.data?.detail || "Login failed."); }
-    finally { setLoading(false); }
+    } catch (e2) {
+      setErr(e2?.response?.data?.detail || "Login failed.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -32,10 +41,18 @@ export default function Login() {
         <h1 className="text-2xl font-bold mb-1">Admin Sign in</h1>
         <p className="text-sm text-ink-500 mb-6">Manage your Zendrive inventory.</p>
         <form onSubmit={submit} className="space-y-4">
-          <div><label className="label">Email</label><input className="input" type="email" required value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} /></div>
-          <div><label className="label">Password</label><input className="input" type="password" required value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} /></div>
+          <div>
+            <label className="label" htmlFor="admin-email">Email</label>
+            <input id="admin-email" className="input" type="email" required value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
+          </div>
+          <div>
+            <label className="label" htmlFor="admin-password">Password</label>
+            <input id="admin-password" className="input" type="password" required value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} />
+          </div>
           {err && <p className="text-accent text-sm">{err}</p>}
-          <button disabled={loading} className="btn-primary w-full !py-3 justify-center">{loading ? "Signing in…" : "Sign in"}</button>
+          <button disabled={loading} className="btn-primary w-full !py-3 justify-center">
+            {loading ? "Signing in..." : "Sign in"}
+          </button>
         </form>
       </div>
     </div>

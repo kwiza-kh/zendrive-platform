@@ -73,6 +73,22 @@ function Test-Port {
     } catch { return $false }
 }
 
+function Wait-PortOpen {
+    param(
+        [int]$Port,
+        [int]$TimeoutSeconds = 60,
+        [string]$Name = 'service'
+    )
+
+    $deadline = (Get-Date).AddSeconds($TimeoutSeconds)
+    while ((Get-Date) -lt $deadline) {
+        if (Test-Port -Port $Port) { return $true }
+        Start-Sleep -Milliseconds 500
+    }
+
+    throw "$Name did not become ready on port $Port within $TimeoutSeconds seconds."
+}
+
 function Get-PortPid {
     param([int]$Port)
     $line = (netstat -ano | Select-String ":$Port\s.*LISTENING" | Select-Object -First 1)
@@ -241,7 +257,7 @@ function Invoke-Start {
     $cmd = if ($svc.Kind -eq 'python') {
         "cd '$path'; if (-not (Test-Path '.venv')) { python -m venv .venv }; .\.venv\Scripts\Activate.ps1; pip install -q python-dotenv; pip install -r requirements.txt -q; python run.py"
     } else {
-        "cd '$path'; if (-not (Test-Path 'node_modules')) { npm install }; npm start"
+        "`$env:PORT = $($svc.Port); cd '$path'; if (-not (Test-Path 'node_modules')) { npm install }; npm start"
     }
 
     if ($Foreground) {
@@ -309,7 +325,19 @@ if ($Help) { Show-CommandHelp -Cmd $Command; exit 0 }
 $targets = Resolve-Services -Names $Service
 
 switch ($Command) {
-    'start'   { foreach ($n in $targets) { Invoke-Start   -Name $n } }
+    'start'   {
+        $ordered = @()
+        if ($targets -contains 'backend') { $ordered += 'backend' }
+        if ($targets -contains 'user')    { $ordered += 'user' }
+        if ($targets -contains 'admin')   { $ordered += 'admin' }
+
+        foreach ($n in $ordered) {
+            Invoke-Start -Name $n
+            if ($n -eq 'backend' -and (($ordered -contains 'user') -or ($ordered -contains 'admin'))) {
+                Wait-PortOpen -Port $Services.backend.Port -Name 'backend' | Out-Null
+            }
+        }
+    }
     'stop'    { foreach ($n in $targets) { Invoke-Stop    -Name $n } }
     'install' { foreach ($n in $targets) { Invoke-Install -Name $n } }
     'env'     { foreach ($n in $targets) { Invoke-Env     -Name $n } }

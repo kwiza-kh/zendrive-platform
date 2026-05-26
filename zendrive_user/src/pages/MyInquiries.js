@@ -76,13 +76,13 @@ export default function MyInquiries() {
         <div className="space-y-4">
           {inquiries.map((inq) => (
             <div key={inq.id} className="card p-6">
-              <div className="flex items-start gap-5">
+              <div className="flex items-start gap-4 sm:gap-5">
                 {inq.car ? (
-                  <Link to={`/cars/${inq.car.slug}`} className="flex-shrink-0 w-40 h-28 rounded-lg overflow-hidden bg-ink-900">
+                  <Link to={`/cars/${inq.car.slug}`} className="flex-shrink-0 w-20 h-14 sm:w-40 sm:h-28 rounded-lg overflow-hidden bg-ink-900">
                     <img src={resolveImage(inq.car.image)} alt={inq.car.name} className="w-full h-full object-cover" />
                   </Link>
                 ) : (
-                  <div className="flex-shrink-0 w-40 h-28 rounded-lg bg-ink-900 grid place-items-center">
+                  <div className="flex-shrink-0 w-20 h-14 sm:w-40 sm:h-28 rounded-lg bg-ink-900 grid place-items-center">
                     <FiMail className="text-ink-500" size={28} />
                   </div>
                 )}

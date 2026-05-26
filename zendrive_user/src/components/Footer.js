@@ -6,13 +6,13 @@ import { socialMediaApi } from "../services/api";
 
 const PLATFORM_ICON = {
   instagram: FiInstagram,
-  facebook:  FiFacebook,
-  twitter:   FiTwitter,
-  youtube:   FiYoutube,
-  linkedin:  FiLinkedin,
-  whatsapp:  FaWhatsapp,
-  tiktok:    FaTiktok,
-  telegram:  FaTelegramPlane,
+  facebook: FiFacebook,
+  twitter: FiTwitter,
+  youtube: FiYoutube,
+  linkedin: FiLinkedin,
+  whatsapp: FaWhatsapp,
+  tiktok: FaTiktok,
+  telegram: FaTelegramPlane,
 };
 
 export default function Footer() {
@@ -23,18 +23,22 @@ export default function Footer() {
   }, []);
 
   return (
-    <footer className="bg-ink-900 text-zen-line mt-24">
-      <div className="container-zen py-16 grid gap-10 md:grid-cols-4">
-        <div className="md:col-span-2">
+    <footer className="mt-24 relative overflow-hidden bg-ink-900 text-zen-line">
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute -right-24 top-0 h-72 w-72 rounded-full bg-accent/20 blur-3xl float-gentle" />
+        <div className="absolute left-1/4 bottom-0 h-64 w-64 rounded-full bg-white/5 blur-3xl" />
+      </div>
+      <div className="container-zen py-16 grid gap-10 md:grid-cols-4 relative">
+        <div className="md:col-span-2 max-w-xl">
           <Link to="/" className="flex items-center gap-2">
-            <img src="/logo.png" alt="Zendrive" className="w-11 h-11 rounded-lg object-cover" />
+            <img src="/logo.png" alt="Zendrive" className="w-11 h-11 rounded-xl object-cover shadow-soft" />
             <div className="font-extrabold tracking-tight text-2xl">
               <span className="text-white">ZEN</span>
               <span className="text-accent">DRIVE</span>
             </div>
           </Link>
-          <p className="mt-5 max-w-md text-sm leading-relaxed text-zen-line/80">
-            Zendrive curates the world's finest vehicles — from electric performance to executive grand tourers.
+          <p className="mt-5 text-sm leading-relaxed text-zen-line/80 text-balance">
+            Zendrive curates the world's finest vehicles, from electric performance to executive grand tourers.
             Drive smarter. Drive bolder.
           </p>
 
@@ -50,7 +54,7 @@ export default function Footer() {
                     target="_blank"
                     rel="noopener noreferrer"
                     title={s.platform.charAt(0).toUpperCase() + s.platform.slice(1)}
-                    className="w-10 h-10 grid place-items-center rounded-full bg-white/5 hover:bg-accent transition-colors text-white"
+                    className="w-10 h-10 grid place-items-center rounded-full bg-white/10 hover:bg-accent transition-all duration-200 text-white hover:-translate-y-0.5 hover:shadow-soft"
                   >
                     <Icon size={16} />
                   </a>
@@ -63,11 +67,11 @@ export default function Footer() {
         <div>
           <h4 className="text-white font-bold mb-4 uppercase text-xs tracking-widest">Explore</h4>
           <ul className="space-y-2.5 text-sm">
-            <li><Link to="/cars" className="hover:text-accent transition">All Inventory</Link></li>
-            <li><Link to="/cars?body_type=SUV" className="hover:text-accent transition">SUVs</Link></li>
-            <li><Link to="/cars?fuel_type=Electric" className="hover:text-accent transition">Electric</Link></li>
-            <li><Link to="/about" className="hover:text-accent transition">About Zendrive</Link></li>
-            <li><Link to="/contact" className="hover:text-accent transition">Contact</Link></li>
+            <li><Link to="/cars" className="hover:text-accent transition-colors duration-200">All Inventory</Link></li>
+            <li><Link to="/cars?body_type=SUV" className="hover:text-accent transition-colors duration-200">SUVs</Link></li>
+            <li><Link to="/cars?fuel_type=Electric" className="hover:text-accent transition-colors duration-200">Electric</Link></li>
+            <li><Link to="/about" className="hover:text-accent transition-colors duration-200">About Zendrive</Link></li>
+            <li><Link to="/contact" className="hover:text-accent transition-colors duration-200">Contact</Link></li>
           </ul>
         </div>
 
