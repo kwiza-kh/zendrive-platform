@@ -13,7 +13,7 @@ export default function Login() {
     setErr("");
     setLoading(true);
     try {
-      const { data } = await api.post("/api/auth/login", form);
+      const { data } = await api.post("/api/admin/login", form);
       if (!data.user.is_admin) {
         setErr("This account is not an admin.");
         setLoading(false);

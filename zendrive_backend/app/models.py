@@ -67,33 +67,6 @@ class ContactInfo(Base):
     sort_order = Column(Integer, default=0)
 
 
-class CartItem(Base):
-    __tablename__ = "cart_items"
-    id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
-    car_id = Column(Integer, ForeignKey("cars.id"), nullable=False, index=True)
-    created_at = Column(DateTime, default=datetime.utcnow)
-
-    user = relationship("User", backref="cart_items")
-    car = relationship("Car", backref="cart_items")
-
-
-class Inquiry(Base):
-    __tablename__ = "inquiries"
-    id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey("users.id"), nullable=True, index=True)
-    car_id = Column(Integer, ForeignKey("cars.id"), nullable=True)
-    name = Column(String(120), nullable=False)
-    email = Column(String(120), nullable=False)
-    phone = Column(String(40), nullable=True)
-    message = Column(Text, default="")
-    status = Column(String(20), default="new")  # new, contacted, closed
-    created_at = Column(DateTime, default=datetime.utcnow)
-
-    user = relationship("User", backref="inquiries")
-    car = relationship("Car", backref="inquiries")
-
-
 class SocialMedia(Base):
     __tablename__ = "social_media"
     id = Column(Integer, primary_key=True, index=True)

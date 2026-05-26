@@ -5,26 +5,26 @@ module.exports = {
     extend: {
       colors: {
         ink: {
-          900: "#0F172A",
-          800: "#1E293B",
-          700: "#334155",
-          500: "#64748B",
-          300: "#CBD5E1",
+          900: "#121416",
+          800: "#20242A",
+          700: "#3A414B",
+          500: "#6D737D",
+          300: "#C9C2B8",
         },
         accent: {
-          DEFAULT: "#DC2626",
-          dark: "#991B1B",
-          darker: "#7F1D1D",
+          DEFAULT: "#CF1F2B",
+          dark: "#9F1520",
+          darker: "#7F1119",
         },
         zen: {
-          bg: "#F8FAFC",
+          bg: "#F5F3EF",
           card: "#FFFFFF",
-          line: "#E2E8F0",
+          line: "#DED8CE",
         },
       },
       fontFamily: {
         sans: ["Montserrat", "ui-sans-serif", "system-ui", "sans-serif"],
-        display: ["Cormorant", "ui-serif", "Georgia", "serif"],
+        display: ["Cormorant Garamond", "Cormorant", "ui-serif", "Georgia", "serif"],
       },
       boxShadow: {
         soft: "0 10px 30px -12px rgba(15,23,42,0.18)",

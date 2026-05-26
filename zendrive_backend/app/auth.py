@@ -11,7 +11,7 @@ from .database import get_db
 from . import models
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/auth/login", auto_error=False)
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/admin/login", auto_error=False)
 
 
 def hash_password(password: str) -> str:
@@ -54,16 +54,3 @@ def require_admin(user: models.User = Depends(get_current_user)) -> models.User:
     if not user.is_admin:
         raise HTTPException(status_code=403, detail="Admin only")
     return user
-
-
-def get_optional_user(token: Optional[str] = Depends(oauth2_scheme), db: Session = Depends(get_db)) -> Optional[models.User]:
-    if not token:
-        return None
-    try:
-        payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
-        user_id: int = payload.get("sub")
-        if user_id is None:
-            return None
-    except JWTError:
-        return None
-    return db.query(models.User).filter(models.User.id == int(user_id)).first()

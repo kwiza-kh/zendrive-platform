@@ -1,8 +1,19 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { FiPhone, FiMail, FiMapPin, FiInstagram, FiFacebook, FiTwitter, FiYoutube, FiLinkedin } from "react-icons/fi";
+import {
+  FiClock,
+  FiExternalLink,
+  FiPhone,
+  FiMail,
+  FiMapPin,
+  FiInstagram,
+  FiFacebook,
+  FiTwitter,
+  FiYoutube,
+  FiLinkedin,
+} from "react-icons/fi";
 import { FaWhatsapp, FaTiktok, FaTelegramPlane } from "react-icons/fa";
-import { socialMediaApi } from "../services/api";
+import { contactInfoApi, socialMediaApi } from "../services/api";
 
 const PLATFORM_ICON = {
   instagram: FiInstagram,
@@ -15,78 +26,133 @@ const PLATFORM_ICON = {
   telegram: FaTelegramPlane,
 };
 
+const CONTACT_ICON = {
+  address: FiMapPin,
+  phone: FiPhone,
+  email: FiMail,
+  hours: FiClock,
+};
+
+const FALLBACK_CONTACTS = [
+  { id: "address", kind: "address", value: "120 Highline Ave, Suite 800, New York, NY 10001", link: null },
+  { id: "phone", kind: "phone", value: "+1 (555) 936-7483", link: "tel:+15559367483" },
+  { id: "email", kind: "email", value: "hello@zendrive.com", link: "mailto:hello@zendrive.com" },
+];
+
+const contactHref = (item) => {
+  if (item.link) return item.link;
+  if (item.kind === "phone") return `tel:${item.value.replace(/[^+\d]/g, "")}`;
+  if (item.kind === "email") return `mailto:${item.value}`;
+  return null;
+};
+
 export default function Footer() {
+  const [contacts, setContacts] = useState(FALLBACK_CONTACTS);
   const [socials, setSocials] = useState([]);
 
   useEffect(() => {
-    socialMediaApi.list().then((r) => setSocials(r.data)).catch(() => {});
+    contactInfoApi
+      .list()
+      .then((response) => {
+        const items = Array.isArray(response.data)
+          ? response.data.filter((item) => ["address", "phone", "email", "hours"].includes(item.kind))
+          : [];
+        if (items.length > 0) setContacts(items);
+      })
+      .catch(() => {});
+
+    socialMediaApi
+      .list()
+      .then((response) => {
+        const enabledLinks = Array.isArray(response.data)
+          ? response.data.filter((item) => item.url?.trim())
+          : [];
+        setSocials(enabledLinks);
+      })
+      .catch(() => {});
   }, []);
 
   return (
     <footer className="mt-24 relative overflow-hidden bg-ink-900 text-zen-line">
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute -right-24 top-0 h-72 w-72 rounded-full bg-accent/20 blur-3xl float-gentle" />
-        <div className="absolute left-1/4 bottom-0 h-64 w-64 rounded-full bg-white/5 blur-3xl" />
-      </div>
-      <div className="container-zen py-16 grid gap-10 md:grid-cols-4 relative">
-        <div className="md:col-span-2 max-w-xl">
+      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-accent/70 to-transparent" />
+      <div className={`container-zen py-14 md:py-16 grid gap-10 md:grid-cols-2 ${
+        socials.length > 0
+          ? "lg:grid-cols-[1.35fr_0.72fr_1fr_1fr]"
+          : "lg:grid-cols-[1.55fr_0.8fr_1fr]"
+      }`}>
+        <div className="max-w-md">
           <Link to="/" className="flex items-center gap-2">
-            <img src="/logo.png" alt="Zendrive" className="w-11 h-11 rounded-xl object-cover shadow-soft" />
-            <div className="font-extrabold tracking-tight text-2xl">
+            <img src="/logo.png" alt="Zendrive" className="w-11 h-11 rounded-lg object-cover shadow-soft" />
+            <div className="font-extrabold text-2xl">
               <span className="text-white">ZEN</span>
               <span className="text-accent">DRIVE</span>
             </div>
           </Link>
-          <p className="mt-5 text-sm leading-relaxed text-zen-line/80 text-balance">
-            Zendrive curates the world's finest vehicles, from electric performance to executive grand tourers.
-            Drive smarter. Drive bolder.
+          <p className="mt-5 text-sm leading-relaxed text-zen-line/80">
+            Zendrive curates premium vehicles, from electric performance to executive grand tourers.
           </p>
+        </div>
 
-          {socials.length > 0 && (
-            <div className="flex items-center gap-3 mt-6 flex-wrap">
-              {socials.map((s) => {
-                const Icon = PLATFORM_ICON[s.platform];
-                if (!Icon) return null;
+        <nav aria-label="Footer navigation">
+          <h4 className="text-white font-bold mb-4 uppercase text-xs tracking-widest">Explore</h4>
+          <ul className="space-y-2.5 text-sm">
+            <li><Link to="/" className="hover:text-accent transition-colors duration-200">Home</Link></li>
+            <li><Link to="/cars" className="hover:text-accent transition-colors duration-200">Inventory</Link></li>
+            <li><Link to="/contact" className="hover:text-accent transition-colors duration-200">Contact</Link></li>
+          </ul>
+        </nav>
+
+        <div>
+          <h4 className="text-white font-bold mb-4 uppercase text-xs tracking-widest">Reach Us</h4>
+          <ul className="space-y-3 text-sm text-zen-line/80">
+            {contacts.map((item) => {
+              const Icon = CONTACT_ICON[item.kind] || FiMapPin;
+              const href = contactHref(item);
+              return (
+                <li key={item.id} className="flex items-start gap-2.5">
+                  <Icon className="mt-0.5 text-accent flex-shrink-0" />
+                  {href ? (
+                    <a href={href} className="hover:text-white transition-colors duration-200 break-words">
+                      {item.value}
+                    </a>
+                  ) : (
+                    <span className="break-words">{item.value}</span>
+                  )}
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+
+        {socials.length > 0 && (
+          <div>
+            <h4 className="text-white font-bold mb-4 uppercase text-xs tracking-widest">Follow Us</h4>
+            <div className="grid gap-2">
+              {socials.map((item) => {
+                const Icon = PLATFORM_ICON[item.platform] || FiExternalLink;
+                const label = item.platform.charAt(0).toUpperCase() + item.platform.slice(1);
                 return (
                   <a
-                    key={s.platform}
-                    href={s.url}
+                    key={item.platform}
+                    href={item.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    title={s.platform.charAt(0).toUpperCase() + s.platform.slice(1)}
-                    className="w-10 h-10 grid place-items-center rounded-full bg-white/10 hover:bg-accent transition-all duration-200 text-white hover:-translate-y-0.5 hover:shadow-soft"
+                    className="inline-flex items-center gap-3 rounded-lg border border-white/10 px-3 py-2.5 text-sm font-medium text-zen-line/80 hover:border-accent/40 hover:bg-white/5 hover:text-white transition-all duration-200"
                   >
-                    <Icon size={16} />
+                    <Icon className="text-accent" size={16} />
+                    <span>{label}</span>
+                    <FiExternalLink size={12} className="ml-auto text-white/35" />
                   </a>
                 );
               })}
             </div>
-          )}
-        </div>
-
-        <div>
-          <h4 className="text-white font-bold mb-4 uppercase text-xs tracking-widest">Explore</h4>
-          <ul className="space-y-2.5 text-sm">
-            <li><Link to="/cars" className="hover:text-accent transition-colors duration-200">All Inventory</Link></li>
-            <li><Link to="/cars?body_type=SUV" className="hover:text-accent transition-colors duration-200">SUVs</Link></li>
-            <li><Link to="/cars?fuel_type=Electric" className="hover:text-accent transition-colors duration-200">Electric</Link></li>
-            <li><Link to="/about" className="hover:text-accent transition-colors duration-200">About Zendrive</Link></li>
-            <li><Link to="/contact" className="hover:text-accent transition-colors duration-200">Contact</Link></li>
-          </ul>
-        </div>
-
-        <div>
-          <h4 className="text-white font-bold mb-4 uppercase text-xs tracking-widest">Reach Us</h4>
-          <ul className="space-y-3 text-sm">
-            <li className="flex items-start gap-2.5"><FiMapPin className="mt-0.5 text-accent flex-shrink-0" /> 120 Highline Ave, Suite 800<br />New York, NY 10001</li>
-            <li className="flex items-center gap-2.5"><FiPhone className="text-accent" /> +1 (555) 936-7483</li>
-            <li className="flex items-center gap-2.5"><FiMail className="text-accent" /> hello@zendrive.com</li>
-          </ul>
-        </div>
+          </div>
+        )}
       </div>
+
       <div className="border-t border-white/10">
         <div className="container-zen py-5 flex flex-col md:flex-row items-center justify-between gap-3 text-xs text-zen-line/60">
-          <p>© {new Date().getFullYear()} Zendrive Motors. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} Zendrive Motors. All rights reserved.</p>
           <p>Crafted for drivers who demand more.</p>
         </div>
       </div>

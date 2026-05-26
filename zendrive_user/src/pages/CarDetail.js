@@ -1,21 +1,15 @@
 import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import { carsApi, inquiriesApi } from "../services/api";
+import { carsApi } from "../services/api";
 import { resolveImage, formatPrice } from "../utils/constants";
 import { FiZap, FiSettings, FiUsers, FiActivity, FiCalendar, FiDroplet, FiCheck, FiArrowLeft, FiShoppingCart } from "react-icons/fi";
 import { useCart } from "../context/CartContext";
-import { useAuth } from "../context/AuthContext";
 
 export default function CarDetail() {
   const { slug } = useParams();
-  const { user } = useAuth();
   const { addToCart, inCart } = useCart();
   const [car, setCar] = useState(null);
   const [activeImg, setActiveImg] = useState(0);
-  const [form, setForm] = useState({ name: "", email: "", phone: "", message: "" });
-  const [sent, setSent] = useState(false);
-  const [err, setErr] = useState("");
-  const [cartAdding, setCartAdding] = useState(false);
 
   useEffect(() => {
     carsApi.detail(slug).then((r) => {
@@ -34,16 +28,6 @@ export default function CarDetail() {
   }
 
   if (!car) return <div className="container-zen py-24 text-center text-ink-500">Loading...</div>;
-
-  const submit = async (e) => {
-    e.preventDefault();
-    try {
-      await inquiriesApi.create({ ...form, car_id: car.id });
-      setSent(true);
-    } catch (error) {
-      setErr(error?.response?.data?.detail || "Failed. Try again.");
-    }
-  };
 
   const hasDiscount = car.discount_price && car.discount_price < car.price;
   const gallery = [
@@ -68,7 +52,7 @@ export default function CarDetail() {
 
       <div className="grid lg:grid-cols-[1.28fr_0.92fr] gap-10">
         <div>
-          <div className="rounded-[2rem] overflow-hidden bg-ink-900 shadow-soft">
+          <div className="rounded-xl overflow-hidden bg-ink-900 shadow-[0_26px_70px_-38px_rgba(18,20,22,0.72)] border border-white/70">
             <img
               src={resolveImage(shown)}
               alt={car.name}
@@ -81,7 +65,7 @@ export default function CarDetail() {
                 <button
                   key={`${src}-${i}`}
                   onClick={() => setActiveImg(i)}
-                  className={`rounded-xl overflow-hidden border transition-all duration-200 ${
+                  className={`rounded-lg overflow-hidden border transition-all duration-200 ${
                     i === activeImg ? "border-accent ring-2 ring-accent/20" : "border-transparent hover:border-zen-line"
                   }`}
                   type="button"
@@ -99,7 +83,7 @@ export default function CarDetail() {
             <h3 className="font-bold mt-8 mb-4 uppercase tracking-widest text-xs text-accent">Specifications</h3>
             <div className="grid sm:grid-cols-2 gap-3">
               {specs.map(([Icon, k, v]) => (
-                <div key={k} className="flex items-center justify-between p-4 bg-zen-bg rounded-2xl border border-zen-line">
+                <div key={k} className="flex items-center justify-between p-4 bg-zen-bg rounded-lg border border-zen-line">
                   <div className="flex items-center gap-2.5 text-ink-700">
                     <Icon className="text-accent" />
                     <span className="text-sm font-semibold">{k}</span>
@@ -143,39 +127,33 @@ export default function CarDetail() {
               )}
             </div>
 
-            {user && (
-              <button
-                onClick={async () => {
-                  if (inCart(car.id)) return;
-                  setCartAdding(true);
-                  try { await addToCart(car.id); } catch {}
-                  setCartAdding(false);
-                }}
-                disabled={inCart(car.id) || cartAdding}
-                className={`mt-5 w-full !py-3.5 flex items-center justify-center gap-2 font-semibold rounded-full transition-all duration-200 ${
-                  inCart(car.id) ? "bg-accent text-white cursor-default" : "btn-outline"
-                }`}
-              >
-                {inCart(car.id) ? (
-                  <><FiCheck /> Added to Cart</>
-                ) : cartAdding ? (
-                  "Adding..."
-                ) : (
-                  <><FiShoppingCart /> Add to Cart</>
-                )}
-              </button>
-            )}
+            <button
+              onClick={() => {
+                if (inCart(car.id)) return;
+                addToCart(car);
+              }}
+              disabled={inCart(car.id)}
+              className={`mt-5 w-full !py-3.5 flex items-center justify-center gap-2 font-semibold rounded-full transition-all duration-200 ${
+                inCart(car.id) ? "bg-accent text-white cursor-default" : "btn-outline"
+              }`}
+            >
+              {inCart(car.id) ? (
+                <><FiCheck /> Added to Cart</>
+              ) : (
+                <><FiShoppingCart /> Add to Cart</>
+              )}
+            </button>
 
             <div className="grid grid-cols-3 gap-2 mt-6">
-              <div className="text-center bg-zen-bg rounded-2xl py-3 border border-zen-line">
+              <div className="text-center bg-zen-bg rounded-lg py-3 border border-zen-line">
                 <p className="text-[10px] uppercase tracking-widest text-ink-500">Power</p>
                 <p className="font-bold mt-0.5">{car.horsepower} HP</p>
               </div>
-              <div className="text-center bg-zen-bg rounded-2xl py-3 border border-zen-line">
+              <div className="text-center bg-zen-bg rounded-lg py-3 border border-zen-line">
                 <p className="text-[10px] uppercase tracking-widest text-ink-500">Body</p>
                 <p className="font-bold mt-0.5">{car.body_type}</p>
               </div>
-              <div className="text-center bg-zen-bg rounded-2xl py-3 border border-zen-line">
+              <div className="text-center bg-zen-bg rounded-lg py-3 border border-zen-line">
                 <p className="text-[10px] uppercase tracking-widest text-ink-500">Year</p>
                 <p className="font-bold mt-0.5">{car.year}</p>
               </div>
@@ -183,23 +161,12 @@ export default function CarDetail() {
           </div>
 
           <div className="card p-7 md:p-8">
-            <h3 className="font-display text-2xl mb-1">Request this car</h3>
-            <p className="text-sm text-ink-500 mb-5">A specialist will reach out within 30 minutes.</p>
-
-            {sent ? (
-              <div className="bg-accent/10 border border-accent/30 text-accent p-4 rounded-2xl text-sm font-semibold text-center">
-                Inquiry received. We'll contact you soon.
-              </div>
-            ) : (
-              <form onSubmit={submit} className="space-y-3">
-                <input className="input" placeholder="Full name" required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
-                <input className="input" type="email" placeholder="Email" required value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
-                <input className="input" placeholder="Phone (optional)" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
-                <textarea className="input min-h-[100px] resize-none" placeholder="Message" value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })} />
-                {err && <p className="text-accent text-sm">{err}</p>}
-                <button className="btn-primary w-full !py-3.5">Request callback</button>
-              </form>
-            )}
+            <h3 className="font-display text-2xl mb-1">Need help choosing?</h3>
+            <p className="text-sm text-ink-500 mb-5">Talk with Zendrive or compare this car against your saved vehicles.</p>
+            <div className="grid gap-3">
+              <Link to="/contact" className="btn-primary w-full !py-3.5">Contact Zendrive</Link>
+              <Link to="/cart" className="btn-outline w-full !py-3.5">View saved vehicles</Link>
+            </div>
           </div>
         </aside>
       </div>

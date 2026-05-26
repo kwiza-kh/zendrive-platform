@@ -62,22 +62,27 @@ export default function Cars() {
 
   return (
     <div className="container-zen py-12 page-enter">
-      <div className="mb-8">
+      <div className="mb-8 rounded-xl border border-zen-line bg-white/68 p-6 md:p-8 shadow-soft backdrop-blur-sm">
         <p className="section-eyebrow">Inventory</p>
-        <h1 className="section-title">Find your Zendrive.</h1>
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
+          <h1 className="section-title">Find your Zendrive.</h1>
+          <p className="max-w-xl text-sm leading-relaxed text-ink-700">
+            Search curated performance, luxury, and electric vehicles with showroom-level details.
+          </p>
+        </div>
       </div>
 
-      <form onSubmit={(e) => { e.preventDefault(); setFilter("q", q); }} className="flex gap-2 mb-6">
+      <form onSubmit={(e) => { e.preventDefault(); setFilter("q", q); }} className="mb-6 grid gap-2 rounded-xl border border-zen-line bg-white/86 p-2 shadow-soft backdrop-blur-sm sm:grid-cols-[1fr_auto]">
         <div className="relative flex-1">
           <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-ink-500" />
           <input
             value={q}
             onChange={(e) => setQ(e.target.value)}
             placeholder="Search by name, model, or keyword..."
-            className="input pl-11"
+            className="input border-transparent bg-transparent pl-11 focus:bg-white"
           />
         </div>
-        <button className="btn-primary !px-7">Search</button>
+        <button className="btn-primary w-full !px-7 sm:w-auto sm:min-w-[112px]">Search</button>
       </form>
 
       <div className="lg:hidden mb-4">
@@ -118,6 +123,7 @@ export default function Cars() {
                   key={b}
                   onClick={() => setFilter("body_type", filters.body_type === b ? "" : b)}
                   className={`chip ${filters.body_type === b ? "!bg-ink-900 !text-white !border-ink-900" : ""}`}
+                  type="button"
                 >
                   {b}
                 </button>
@@ -133,6 +139,7 @@ export default function Cars() {
                   key={b}
                   onClick={() => setFilter("fuel_type", filters.fuel_type === b ? "" : b)}
                   className={`chip ${filters.fuel_type === b ? "!bg-accent !text-white !border-accent" : ""}`}
+                  type="button"
                 >
                   {b}
                 </button>

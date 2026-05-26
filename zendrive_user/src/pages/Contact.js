@@ -1,6 +1,21 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { FiPhone, FiMail, FiMapPin, FiClock, FiExternalLink, FiInfo } from "react-icons/fi";
-import { inquiriesApi, contactInfoApi } from "../services/api";
+import { Link } from "react-router-dom";
+import {
+  FiPhone,
+  FiMail,
+  FiMapPin,
+  FiClock,
+  FiExternalLink,
+  FiInfo,
+  FiArrowRight,
+  FiInstagram,
+  FiFacebook,
+  FiTwitter,
+  FiYoutube,
+  FiLinkedin,
+} from "react-icons/fi";
+import { FaWhatsapp, FaTiktok, FaTelegramPlane } from "react-icons/fa";
+import { contactInfoApi, socialMediaApi } from "../services/api";
 
 const ICONS = {
   address: FiMapPin,
@@ -14,14 +29,23 @@ const FALLBACK = [
   { id: "f1", kind: "address", label: "Showroom", value: "120 Highline Ave, Suite 800, NY 10001", link: "https://www.google.com/maps/search/?api=1&query=120+Highline+Ave+Suite+800+NY+10001" },
   { id: "f2", kind: "phone", label: "Phone", value: "+1 (555) 936-7483", link: "tel:+15559367483" },
   { id: "f3", kind: "email", label: "Email", value: "hello@zendrive.com", link: "mailto:hello@zendrive.com" },
-  { id: "f4", kind: "hours", label: "Hours", value: "Mon-Sat: 9am - 8pm · Sun: 10am - 6pm", link: null },
+  { id: "f4", kind: "hours", label: "Hours", value: "Mon-Sat: 9am - 8pm / Sun: 10am - 6pm", link: null },
 ];
+
+const PLATFORM_ICON = {
+  instagram: FiInstagram,
+  facebook: FiFacebook,
+  twitter: FiTwitter,
+  youtube: FiYoutube,
+  linkedin: FiLinkedin,
+  whatsapp: FaWhatsapp,
+  tiktok: FaTiktok,
+  telegram: FaTelegramPlane,
+};
 
 const buildLink = (item) => {
   if (item.link) return item.link;
-  if (item.kind === "address") {
-    return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.value)}`;
-  }
+  if (item.kind === "address") return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.value)}`;
   if (item.kind === "phone") return `tel:${item.value.replace(/[^+\d]/g, "")}`;
   if (item.kind === "email") return `mailto:${item.value}`;
   return null;
@@ -40,7 +64,6 @@ const buildMapEmbedUrl = (item) => {
     const url = new URL(rawLink);
     const host = url.hostname.replace(/^www\./, "");
     const isGoogleMaps = host.includes("google.com") || host.includes("maps.google");
-
     if (isGoogleMaps) {
       const query =
         url.searchParams.get("query") ||
@@ -49,24 +72,58 @@ const buildMapEmbedUrl = (item) => {
         fallbackQuery;
       return `https://www.google.com/maps?q=${encodeURIComponent(query)}&output=embed`;
     }
-  } catch (_) {
-    // Fall back to a query-only embed URL.
-  }
+  } catch (_) {}
 
   return `https://www.google.com/maps?q=${encodeURIComponent(fallbackQuery)}&output=embed`;
 };
 
+function ContactDetail({ item }) {
+  const Icon = ICONS[item.kind] || FiInfo;
+  const href = buildLink(item);
+  const isLink = !!href;
+
+  return (
+    <article className="rounded-2xl border border-zen-line bg-white p-4">
+      <div className="flex items-start gap-4">
+        <div className="w-11 h-11 rounded-2xl bg-ink-900 grid place-items-center flex-shrink-0">
+          <Icon className="text-accent" size={18} />
+        </div>
+        <div className="min-w-0 flex-1">
+          <p className="text-[11px] uppercase tracking-[0.28em] text-ink-500 font-bold">{item.label}</p>
+          {isLink ? (
+            <a
+              href={href}
+              target={href.startsWith("http") ? "_blank" : undefined}
+              rel="noopener noreferrer"
+              className="mt-1 inline-flex items-center gap-2 font-semibold text-ink-900 hover:text-accent transition-colors break-words"
+            >
+              <span>{item.value}</span>
+              {href.startsWith("http") && <FiExternalLink className="flex-shrink-0" size={14} />}
+            </a>
+          ) : (
+            <p className="mt-1 font-semibold text-ink-900 break-words">{item.value}</p>
+          )}
+        </div>
+      </div>
+    </article>
+  );
+}
+
 export default function Contact() {
-  const [form, setForm] = useState({ name: "", email: "", phone: "", message: "" });
-  const [sent, setSent] = useState(false);
-  const [err, setErr] = useState("");
   const [items, setItems] = useState(FALLBACK);
+  const [socials, setSocials] = useState([]);
 
   useEffect(() => {
     contactInfoApi
       .list()
       .then((r) => {
         if (Array.isArray(r.data) && r.data.length > 0) setItems(r.data);
+      })
+      .catch(() => {});
+    socialMediaApi
+      .list()
+      .then((r) => {
+        if (Array.isArray(r.data)) setSocials(r.data);
       })
       .catch(() => {});
   }, []);
@@ -79,133 +136,104 @@ export default function Contact() {
   const mapHref = buildLink(primaryAddress);
   const mapSrc = buildMapEmbedUrl(primaryAddress);
 
-  const submit = async (e) => {
-    e.preventDefault();
-    try {
-      await inquiriesApi.create(form);
-      setSent(true);
-    } catch (e2) {
-      setErr(e2?.response?.data?.detail || "Failed. Try again.");
-    }
-  };
-
   return (
-    <div className="container-zen py-16">
-      <div className="text-center max-w-2xl mx-auto mb-14">
-        <p className="section-eyebrow">Get in touch</p>
-        <h1 className="section-title">Talk to a Zendrive specialist.</h1>
-        <p className="mt-4 text-ink-500">Schedule a test drive, ask about a model, or just say hi.</p>
-      </div>
-
-      <div className="grid lg:grid-cols-[0.95fr_1.05fr] gap-10 items-start">
-        <div className="space-y-6">
-          <div className="space-y-4">
-            {visibleItems.map((it) => {
-              const Icon = ICONS[it.kind] || FiInfo;
-              const href = buildLink(it);
-              const isLink = !!href;
-
-              return (
-                <div key={it.id} className="card p-5 flex items-start gap-4">
-                  <div className="w-11 h-11 rounded-lg bg-ink-900 grid place-items-center flex-shrink-0">
-                    <Icon className="text-accent" />
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="text-xs uppercase tracking-widest text-ink-500 font-semibold">{it.label}</p>
-                    {isLink ? (
-                      <a
-                        href={href}
-                        target={href.startsWith("http") ? "_blank" : undefined}
-                        rel="noopener noreferrer"
-                        className="font-semibold text-ink-900 mt-0.5 inline-flex items-center gap-1.5 hover:text-accent break-words"
-                      >
-                        <span className="break-words">{it.value}</span>
-                        {href.startsWith("http") && <FiExternalLink className="flex-shrink-0" />}
-                      </a>
-                    ) : (
-                      <p className="font-semibold text-ink-900 mt-0.5 break-words">{it.value}</p>
-                    )}
-                    {it.kind === "address" && isLink && (
-                      <p className="text-xs text-ink-500 mt-1">Click to open in maps</p>
-                    )}
-                  </div>
-                </div>
-              );
-            })}
+    <div className="page-enter">
+      <section className="container-zen pt-8 md:pt-12">
+        <div className="grid gap-6 lg:grid-cols-[1.05fr_0.95fr] items-end">
+          <div className="max-w-3xl">
+            <p className="section-eyebrow">Get in touch</p>
+            <h1 className="section-title text-balance">Talk to a Zendrive specialist.</h1>
+            <p className="mt-4 text-ink-700 max-w-2xl leading-relaxed text-balance">
+              Schedule a test drive, ask about a model, or book a showroom visit. We usually reply the same day.
+            </p>
           </div>
+          <div className="flex lg:justify-end">
+            <Link to="/cars" className="btn-outline !px-5 !py-3">
+              Browse inventory <FiArrowRight />
+            </Link>
+          </div>
+        </div>
+      </section>
 
-          <div className="card overflow-hidden">
-            <div className="flex items-start justify-between gap-4 p-5 md:p-6 border-b border-zen-line">
-              <div>
-                <p className="section-eyebrow">Visit us</p>
-                <h2 className="font-display text-2xl md:text-3xl text-ink-900">Showroom map</h2>
-                <p className="mt-2 text-sm text-ink-500 break-words">
-                  {primaryAddress.label}: {primaryAddress.value}
-                </p>
-              </div>
-              {mapHref && (
-                <a
-                  href={mapHref}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="btn-outline !px-4 !py-2 text-sm whitespace-nowrap"
-                >
-                  Open in Maps
-                </a>
-              )}
+      <section className="container-zen py-10 md:py-14 pb-20">
+        <div className="grid gap-8 lg:grid-cols-[0.82fr_1.18fr] items-start">
+          <aside className="surface-panel p-5 md:p-6">
+            <p className="section-eyebrow mb-2">Contact details</p>
+            <h2 className="font-display text-3xl text-ink-900">Reach Zendrive</h2>
+            <div className="mt-6 grid gap-3">
+              {visibleItems.map((item, index) => (
+                <div key={item.id} className="page-enter" style={{ animationDelay: `${index * 70}ms` }}>
+                  <ContactDetail item={item} />
+                </div>
+              ))}
             </div>
-            <div className="relative bg-zen-bg">
+
+            {socials.length > 0 && (
+              <div className="mt-7 border-t border-zen-line pt-6">
+                <p className="text-xs uppercase tracking-[0.22em] text-ink-500 font-bold">Social media</p>
+                <div className="mt-4 grid grid-cols-2 gap-3">
+                  {socials.map((social) => {
+                    const Icon = PLATFORM_ICON[social.platform] || FiExternalLink;
+                    const label = social.platform.charAt(0).toUpperCase() + social.platform.slice(1);
+                    return (
+                      <a
+                        key={social.platform}
+                        href={social.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-3 rounded-2xl border border-zen-line bg-white px-4 py-3 font-semibold text-ink-900 transition-all duration-200 hover:border-accent/30 hover:text-accent hover:shadow-soft"
+                      >
+                        <span className="w-9 h-9 rounded-xl bg-ink-900 grid place-items-center text-accent flex-shrink-0">
+                          <Icon size={16} />
+                        </span>
+                        <span className="truncate">{label}</span>
+                      </a>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+          </aside>
+
+          <div className="surface-panel overflow-hidden">
+            <div className="p-5 md:p-6 border-b border-zen-line">
+              <p className="section-eyebrow mb-2">Visit us</p>
+              <h2 className="font-display text-3xl text-ink-900">Showroom map</h2>
+              <p className="mt-2 text-sm text-ink-500 break-words">
+                {primaryAddress.label}: {primaryAddress.value}
+              </p>
+            </div>
+            <div className="bg-zen-bg">
               {mapSrc ? (
                 <iframe
                   title="Zendrive showroom map"
                   src={mapSrc}
-                  className="block w-full h-[320px] md:h-[420px] border-0"
+                  className="block w-full h-[420px] md:h-[560px] border-0"
                   loading="lazy"
                   referrerPolicy="no-referrer-when-downgrade"
                   allowFullScreen
                 />
               ) : (
-                <div className="h-[320px] md:h-[420px] grid place-items-center p-8 text-center text-ink-500">
+                <div className="h-[420px] md:h-[560px] grid place-items-center p-8 text-center text-ink-500">
                   Map preview is unavailable.
                 </div>
               )}
             </div>
+            {mapHref && (
+              <div className="p-5 md:p-6 border-t border-zen-line">
+                <a
+                  href={mapHref}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn-dark w-full sm:w-auto"
+                >
+                  Open in Maps <FiExternalLink />
+                </a>
+              </div>
+            )}
           </div>
         </div>
-
-        <form onSubmit={submit} className="card p-8 space-y-4">
-          {sent ? (
-            <div className="text-center py-12">
-              <div className="w-16 h-16 mx-auto rounded-full bg-accent grid place-items-center mb-5 text-3xl text-white">✓</div>
-              <h3 className="font-display text-2xl mb-2">Thank you!</h3>
-              <p className="text-ink-500">We'll be in touch within 30 minutes.</p>
-            </div>
-          ) : (
-            <>
-              <div className="grid sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="label">Name</label>
-                  <input className="input" required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
-                </div>
-                <div>
-                  <label className="label">Email</label>
-                  <input className="input" type="email" required value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
-                </div>
-              </div>
-              <div>
-                <label className="label">Phone</label>
-                <input className="input" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
-              </div>
-              <div>
-                <label className="label">Message</label>
-                <textarea className="input min-h-[140px] resize-none" value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })} />
-              </div>
-              {err && <p className="text-accent text-sm">{err}</p>}
-              <button className="btn-primary w-full !py-3.5">Send message</button>
-            </>
-          )}
-        </form>
-      </div>
+      </section>
     </div>
   );
 }

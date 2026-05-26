@@ -9,7 +9,6 @@ const routeMeta = {
   "/cars/new": { title: "Add Car", parent: { label: "Inventory", to: "/cars" } },
   "/brands": { title: "Brands", parent: null },
   "/body-types": { title: "Body Types", parent: null },
-  "/inquiries": { title: "Inquiries", parent: null },
   "/contact-info": { title: "Contact Info", parent: null },
   "/social-media": { title: "Social Media", parent: null },
 };

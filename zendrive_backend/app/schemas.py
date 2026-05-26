@@ -1,13 +1,6 @@
-from typing import Optional, List
+from typing import Optional
 from datetime import datetime
 from pydantic import BaseModel, EmailStr
-
-
-class UserCreate(BaseModel):
-    name: str
-    email: EmailStr
-    password: str
-    phone: Optional[str] = None
 
 
 class UserLogin(BaseModel):
@@ -130,30 +123,6 @@ class CarOut(CarBase):
         from_attributes = True
 
 
-class InquiryCreate(BaseModel):
-    car_id: Optional[int] = None
-    name: str
-    email: EmailStr
-    phone: Optional[str] = None
-    message: str = ""
-
-
-class InquiryOut(BaseModel):
-    id: int
-    user_id: Optional[int] = None
-    car_id: Optional[int]
-    name: str
-    email: str
-    phone: Optional[str]
-    message: str
-    status: str
-    created_at: datetime
-    car: Optional[CarOut] = None
-
-    class Config:
-        from_attributes = True
-
-
 class ContactInfoBase(BaseModel):
     kind: str = "other"
     label: str
@@ -192,26 +161,7 @@ class SocialMediaOut(BaseModel):
         from_attributes = True
 
 
-class CartItemCreate(BaseModel):
-    car_id: int
-
-
-class CartItemOut(BaseModel):
-    id: int
-    car_id: int
-    created_at: datetime
-    car: Optional[CarOut] = None
-
-    class Config:
-        from_attributes = True
-
-
 class SocialMediaUpdate(BaseModel):
     url: Optional[str] = None
     enabled: Optional[bool] = None
     sort_order: Optional[int] = None
-
-
-class CartOut(BaseModel):
-    items: List[CartItemOut]
-    total: float

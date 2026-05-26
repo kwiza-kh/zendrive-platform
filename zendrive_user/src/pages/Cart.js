@@ -1,68 +1,35 @@
-import React, { useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { FiTrash2, FiArrowLeft, FiShoppingCart, FiCheck } from "react-icons/fi";
+import { FiTrash2, FiArrowLeft, FiShoppingCart } from "react-icons/fi";
+import { FaTelegramPlane } from "react-icons/fa";
 import { useCart } from "../context/CartContext";
-import { useAuth } from "../context/AuthContext";
-import { inquiriesApi } from "../services/api";
+import { socialMediaApi } from "../services/api";
 import { resolveImage, formatPrice } from "../utils/constants";
+import { buildCartTelegramUrl } from "../utils/telegram";
 
 export default function Cart() {
-  const { user } = useAuth();
   const { items, total, loading, removeFromCart, clearCart } = useCart();
-  const [submitting, setSubmitting] = useState(false);
-  const [sent, setSent] = useState(false);
-  const [err, setErr] = useState("");
-
-  if (!user) {
-    return (
-      <div className="container-zen py-24 text-center page-enter">
-        <div className="w-20 h-20 mx-auto rounded-full bg-ink-900 grid place-items-center mb-6 shadow-soft">
-          <FiShoppingCart className="text-accent" size={32} />
-        </div>
-        <h2 className="section-title mb-3">Sign in to view your cart</h2>
-        <p className="text-ink-500 mb-8">Save cars you love and submit inquiries all at once.</p>
-        <div className="flex justify-center gap-3 flex-wrap">
-          <Link to="/login" className="btn-primary">Sign in</Link>
-          <Link to="/register" className="btn-outline">Create account</Link>
-        </div>
-      </div>
-    );
-  }
-
-  if (sent) {
-    return (
-      <div className="container-zen py-24 text-center page-enter">
-        <div className="w-20 h-20 mx-auto rounded-full bg-accent grid place-items-center mb-6 shadow-glow">
-          <FiCheck className="text-white" size={32} />
-        </div>
-        <h2 className="section-title mb-3">Inquiry submitted!</h2>
-        <p className="text-ink-500 mb-8">A Zendrive specialist will contact you within 30 minutes.</p>
-        <Link to="/cars" className="btn-primary">Continue browsing</Link>
-      </div>
-    );
-  }
-
-  const submitInquiry = async () => {
-    setSubmitting(true);
-    setErr("");
-    try {
-      const carNames = items.map((i) => i.car?.name).filter(Boolean).join(", ");
-      await inquiriesApi.create({
-        name: user.name,
-        email: user.email,
-        message: `I'm interested in the following vehicles: ${carNames}`,
-      });
-      await clearCart();
-      setSent(true);
-    } catch (e) {
-      setErr(e?.response?.data?.detail || "Failed. Try again.");
-    } finally {
-      setSubmitting(false);
-    }
-  };
+  const [telegramUrl, setTelegramUrl] = useState("");
 
   const effectivePrice = (car) =>
     car.discount_price && car.discount_price < car.price ? car.discount_price : car.price;
+
+  useEffect(() => {
+    socialMediaApi
+      .list()
+      .then((response) => {
+        const telegram = Array.isArray(response.data)
+          ? response.data.find((item) => item.platform === "telegram" && item.url?.trim())
+          : null;
+        setTelegramUrl(telegram?.url || "");
+      })
+      .catch(() => {});
+  }, []);
+
+  const telegramCheckoutUrl = useMemo(
+    () => buildCartTelegramUrl(telegramUrl, items),
+    [telegramUrl, items]
+  );
 
   return (
     <div className="container-zen py-12 page-enter">
@@ -100,7 +67,7 @@ export default function Cart() {
               if (!car) return null;
               return (
                 <div key={item.id} className="card p-5 flex gap-4 sm:gap-5 card-hover page-enter" style={{ animationDelay: `${index * 60}ms` }}>
-                  <Link to={`/cars/${car.slug}`} className="flex-shrink-0 w-24 h-16 sm:w-48 sm:h-32 rounded-2xl overflow-hidden bg-ink-900">
+                  <Link to={`/cars/${car.slug}`} className="flex-shrink-0 w-24 h-16 sm:w-48 sm:h-32 rounded-lg overflow-hidden bg-ink-900">
                     <img src={resolveImage(car.image)} alt={car.name} className="w-full h-full object-cover" />
                   </Link>
                   <div className="flex-1 min-w-0">
@@ -113,7 +80,7 @@ export default function Cart() {
                       </div>
                       <button
                         onClick={() => removeFromCart(item.id)}
-                        className="w-9 h-9 grid place-items-center rounded-full text-ink-500 hover:text-accent hover:bg-accent/10 transition-all duration-200"
+                        className="w-9 h-9 grid place-items-center rounded-lg text-ink-500 hover:text-accent hover:bg-accent/10 transition-all duration-200"
                         aria-label="Remove"
                       >
                         <FiTrash2 size={16} />
@@ -151,15 +118,24 @@ export default function Cart() {
                 <span className="font-bold text-ink-900">Total</span>
                 <span className="text-2xl font-bold text-accent">{formatPrice(total)}</span>
               </div>
-              {err && <p className="text-accent text-sm">{err}</p>}
+              {telegramUrl && (
+                <a
+                  href={telegramCheckoutUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full !py-3.5 inline-flex items-center justify-center gap-2 rounded-lg bg-[#0088cc] px-6 font-semibold text-white shadow-soft transition-all duration-200 hover:bg-[#0077b3] hover:-translate-y-0.5"
+                >
+                  <FaTelegramPlane size={18} />
+                  Send to Telegram
+                </a>
+              )}
               <button
-                onClick={submitInquiry}
-                disabled={submitting}
+                onClick={clearCart}
                 className="btn-primary w-full !py-3.5"
               >
-                {submitting ? "Submitting..." : "Submit Inquiry"}
+                Clear saved vehicles
               </button>
-              <p className="text-xs text-ink-500 text-center">A specialist will reach out within 30 minutes.</p>
+              <p className="text-xs text-ink-500 text-center">Saved vehicles stay here until you remove them.</p>
             </div>
           </aside>
         </div>

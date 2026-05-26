@@ -48,7 +48,7 @@ export default function Home() {
   return (
     <div className="page-enter">
       <section className="container-zen pt-8 md:pt-12">
-        <div className="relative overflow-hidden rounded-[2rem] border border-zen-line bg-ink-900 shadow-[0_28px_80px_-30px_rgba(15,23,42,0.45)]">
+        <div className="relative overflow-hidden rounded-xl border border-white/70 bg-ink-900 shadow-[0_28px_80px_-36px_rgba(18,20,22,0.55)]">
           <img
             src={bannerImage}
             alt="Zendrive showroom banner"
@@ -56,19 +56,19 @@ export default function Home() {
             loading="eager"
             decoding="async"
           />
-          <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(15,23,42,0.08),rgba(15,23,42,0.34))]" />
+          <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(18,20,22,0.06),rgba(18,20,22,0.42))]" />
         </div>
       </section>
 
       <section className="container-zen pt-6 md:pt-8">
         <div className="hero-frame">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(220,38,38,0.28),transparent_24%),linear-gradient(180deg,rgba(15,23,42,0.82),rgba(15,23,42,0.58))]" />
-          <div className="absolute inset-0 opacity-30 bg-[linear-gradient(rgba(255,255,255,0.08)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.08)_1px,transparent_1px)] bg-[size:72px_72px]" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(207,31,43,0.26),transparent_24%),linear-gradient(180deg,rgba(18,20,22,0.88),rgba(18,20,22,0.66))]" />
+          <div className="absolute inset-0 opacity-25 bg-[linear-gradient(rgba(255,255,255,0.08)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.08)_1px,transparent_1px)] bg-[size:72px_72px]" />
 
           <div className="relative grid lg:grid-cols-[1.15fr_0.85fr] gap-10 lg:gap-12 p-7 sm:p-10 md:p-14 lg:p-16 items-end">
             <div className="max-w-3xl">
               <p className="section-eyebrow !text-white/70">Zendrive - Est. 2026</p>
-              <h1 className="font-display font-semibold text-5xl md:text-7xl leading-[0.95] tracking-tight text-balance">
+              <h1 className="font-display font-semibold text-5xl md:text-7xl leading-[0.92] text-balance">
                 Drive the <span className="text-accent italic">Future</span>.
                 <br />
                 Own the Road.
@@ -97,8 +97,8 @@ export default function Home() {
             </div>
 
             <div className="relative lg:pb-4">
-              <div className="absolute -inset-4 bg-white/10 rounded-[2rem] blur-2xl" />
-              <div className="relative rounded-[2rem] border border-white/10 bg-white/10 backdrop-blur-sm p-5 sm:p-6 shadow-[0_28px_80px_-30px_rgba(15,23,42,0.68)]">
+              <div className="absolute -inset-4 bg-white/10 rounded-xl blur-2xl" />
+              <div className="relative rounded-xl border border-white/10 bg-white/10 backdrop-blur-sm p-5 sm:p-6 shadow-[0_28px_80px_-30px_rgba(18,20,22,0.68)]">
                 <div className="flex items-center justify-between gap-3">
                   <div>
                     <p className="text-[11px] uppercase tracking-[0.28em] text-white/60">This week</p>
@@ -115,10 +115,10 @@ export default function Home() {
                     <Link
                       key={car.id}
                       to={`/cars/${car.slug}`}
-                      className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/10 p-3 hover:bg-white/20 transition-all duration-200"
+                    className="flex items-center gap-3 rounded-lg border border-white/10 bg-white/10 p-3 hover:bg-white/20 transition-all duration-200"
                       style={{ animationDelay: `${index * 110}ms` }}
                     >
-                      <div className="h-16 w-24 shrink-0 overflow-hidden rounded-xl bg-ink-900">
+                      <div className="h-16 w-24 shrink-0 overflow-hidden rounded-lg bg-ink-900">
                         <img src={resolveImage(car.image)} alt={car.name} className="h-full w-full object-cover" />
                       </div>
                       <div className="min-w-0 flex-1">
@@ -130,7 +130,7 @@ export default function Home() {
                     </Link>
                   ))}
                   {latest.length === 0 && (
-                    <div className="rounded-2xl border border-white/10 bg-white/10 p-5 text-sm text-white/70">
+                    <div className="rounded-lg border border-white/10 bg-white/10 p-5 text-sm text-white/70">
                       Loading featured arrivals...
                     </div>
                   )}
@@ -195,7 +195,7 @@ export default function Home() {
         <div className="mt-12 grid sm:grid-cols-2 xl:grid-cols-4 gap-6">
           {BENEFITS.map(([Icon, title, desc], index) => (
             <div key={title} className="card card-hover p-7 page-enter" style={{ animationDelay: `${index * 90}ms` }}>
-              <div className="w-14 h-14 rounded-2xl bg-ink-900 grid place-items-center mb-5">
+              <div className="w-14 h-14 rounded-lg bg-ink-900 grid place-items-center mb-5">
                 <Icon className="text-accent" size={26} />
               </div>
               <h3 className="font-semibold text-ink-900 text-lg mb-2">{title}</h3>
@@ -205,7 +205,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="bg-white/80 border-y border-zen-line py-24 backdrop-blur-sm">
+      <section className="bg-white/62 border-y border-zen-line py-24 backdrop-blur-sm">
         <div className="container-zen">
           <div className="flex items-end justify-between mb-12 flex-wrap gap-4">
             <div>
@@ -267,8 +267,8 @@ export default function Home() {
       </section>
 
       <section className="container-zen pb-24">
-        <div className="rounded-[2rem] bg-ink-900 text-white p-10 md:p-16 grid lg:grid-cols-[0.9fr_1.1fr] gap-10 items-center overflow-hidden relative">
-          <div className="absolute -right-20 -top-20 w-72 h-72 rounded-full bg-accent/25 blur-3xl float-gentle" />
+        <div className="rounded-xl bg-ink-900 text-white p-10 md:p-16 grid lg:grid-cols-[0.9fr_1.1fr] gap-10 items-center overflow-hidden relative shadow-[0_30px_90px_-46px_rgba(18,20,22,0.8)]">
+          <div className="absolute right-0 top-0 h-full w-1/2 bg-[linear-gradient(90deg,transparent,rgba(207,31,43,0.18))]" />
           <div className="relative">
             <p className="section-eyebrow">Ready when you are</p>
             <h2 className="font-display text-4xl md:text-5xl font-semibold leading-tight text-balance">

@@ -8,7 +8,6 @@ import CarsList from "./pages/CarsList";
 import CarForm from "./pages/CarForm";
 import Brands from "./pages/Brands";
 import BodyTypes from "./pages/BodyTypes";
-import Inquiries from "./pages/Inquiries";
 import ContactInfo from "./pages/ContactInfo";
 import SocialMedia from "./pages/SocialMedia";
 import { MobileProvider, useMobile } from "./context/MobileContext";
@@ -52,7 +51,6 @@ export default function App() {
                 <Route path="/cars/:id" element={<CarForm />} />
                 <Route path="/brands" element={<Brands />} />
                 <Route path="/body-types" element={<BodyTypes />} />
-                <Route path="/inquiries" element={<Inquiries />} />
                 <Route path="/contact-info" element={<ContactInfo />} />
                 <Route path="/social-media" element={<SocialMedia />} />
               </Routes>

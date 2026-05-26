@@ -2,7 +2,7 @@ import React from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import {
   FiHome, FiTruck, FiTag, FiLayers,
-  FiMessageSquare, FiLogOut, FiMapPin, FiShare2, FiX,
+  FiLogOut, FiMapPin, FiShare2, FiX,
 } from "react-icons/fi";
 import { useMobile } from "../context/MobileContext";
 
@@ -24,7 +24,6 @@ const navGroups = [
   {
     label: "Customer",
     items: [
-      { to: "/inquiries", label: "Inquiries", icon: FiMessageSquare },
       { to: "/contact-info", label: "Contact Info", icon: FiMapPin },
       { to: "/social-media", label: "Social Media", icon: FiShare2 },
     ],

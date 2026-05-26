@@ -15,7 +15,7 @@ A modern, full-stack car sales website with three parts:
 | Frontend     | React 18, React Router v6, Tailwind CSS, Axios, React Icons |
 | Backend      | FastAPI, SQLAlchemy 2, Postgres / SQLite                    |
 | Storage      | Local `uploads/` directory                                  |
-| Auth         | JWT (python-jose) + bcrypt                                  |
+| Auth         | Admin JWT (python-jose) + bcrypt                            |
 | Deploy       | Docker Compose + Nginx reverse proxy                        |
 
 ---
@@ -190,9 +190,7 @@ Zendrive/
 
 | Method | Path                       | Auth     | Purpose                |
 | ------ | -------------------------- | -------- | ---------------------- |
-| POST   | `/api/auth/register`       | —        | Create user            |
-| POST   | `/api/auth/login`          | —        | Login (JWT)            |
-| GET    | `/api/auth/me`             | User     | Current profile        |
+| POST   | `/api/admin/login`         | —        | Admin login (JWT)      |
 | GET    | `/api/cars`                | —        | List + filter cars     |
 | GET    | `/api/cars/{slug}`         | —        | Car detail             |
 | POST   | `/api/cars`                | Admin    | Create car             |
@@ -200,9 +198,6 @@ Zendrive/
 | DELETE | `/api/cars/{id}`           | Admin    | Delete car             |
 | GET    | `/api/brands`              | —        | List brands            |
 | POST   | `/api/brands`              | Admin    | Create brand           |
-| POST   | `/api/inquiries`           | —        | Public inquiry submit  |
-| GET    | `/api/inquiries`           | Admin    | List inquiries         |
-| PUT    | `/api/inquiries/{id}`      | Admin    | Update status          |
 | POST   | `/api/upload`              | Admin    | Upload image           |
 
 `GET /api/cars` filters: `q`, `brand_id`, `body_type`, `fuel_type`, `min_price`, `max_price`, `is_featured`, `sort` (`newest|price_asc|price_desc`).
@@ -217,5 +212,6 @@ Zendrive/
 ## Notes
 
 - Sample images come from Unsplash; replace `image` URL when adding real cars or upload via `/api/upload`.
+- The customer storefront requires no login; saved vehicles are stored locally in the visitor's browser.
 - The seeder is idempotent — it will not overwrite existing rows. To reset locally, delete `zendrive_backend/zendrive.db`.
 - For production with heavy traffic, switch to Postgres by setting `DATABASE_URL`.

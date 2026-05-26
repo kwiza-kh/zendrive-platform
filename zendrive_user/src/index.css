@@ -1,17 +1,20 @@
+@import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Montserrat:wght@400;500;600;700;800&display=swap");
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  --ink-900: #0f172a;
-  --ink-800: #1e293b;
-  --ink-700: #334155;
-  --accent: #dc2626;
-  --accent-dark: #991b1b;
-  --bg: #f8fafc;
-  --line: #e2e8f0;
-  --shadow-soft: 0 14px 38px -24px rgba(15, 23, 42, 0.32);
-  --shadow-lift: 0 28px 60px -30px rgba(15, 23, 42, 0.38);
+  --ink-900: #121416;
+  --ink-800: #20242a;
+  --ink-700: #3a414b;
+  --accent: #cf1f2b;
+  --accent-dark: #9f1520;
+  --bg: #f5f3ef;
+  --line: #ded8ce;
+  --paper: rgba(255, 255, 255, 0.86);
+  --shadow-soft: 0 18px 48px -34px rgba(18, 20, 22, 0.5);
+  --shadow-lift: 0 30px 74px -42px rgba(18, 20, 22, 0.58);
   --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
 }
@@ -24,13 +27,11 @@ body {
   color: var(--ink-900);
   background-color: var(--bg);
   background-image:
-    radial-gradient(circle at 16% 8%, rgba(220, 38, 38, 0.12), transparent 22%),
-    radial-gradient(circle at 86% 0%, rgba(15, 23, 42, 0.09), transparent 18%),
-    linear-gradient(180deg, #fbfdff 0%, #f7f9fc 50%, #f3f6fb 100%),
-    linear-gradient(rgba(15, 23, 42, 0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(15, 23, 42, 0.03) 1px, transparent 1px);
-  background-size: auto, auto, auto, 56px 56px, 56px 56px;
-  background-repeat: no-repeat, no-repeat, no-repeat, repeat, repeat;
+    linear-gradient(180deg, rgba(255,255,255,0.82) 0%, rgba(245,243,239,0.96) 44%, #eee9df 100%),
+    repeating-linear-gradient(0deg, rgba(18,20,22,0.028) 0 1px, transparent 1px 42px),
+    repeating-linear-gradient(90deg, rgba(18,20,22,0.022) 0 1px, transparent 1px 42px);
+  background-size: auto, 42px 42px, 42px 42px;
+  background-repeat: no-repeat, repeat, repeat;
   background-attachment: fixed;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -64,14 +65,14 @@ body {
   .container-zen { @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8; }
 
   .btn {
-    @apply inline-flex items-center justify-center gap-2 font-semibold rounded-full transition-all duration-200 cursor-pointer focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 disabled:opacity-60 disabled:pointer-events-none active:scale-95;
+    @apply inline-flex min-h-[44px] items-center justify-center gap-2 font-semibold rounded-lg transition-all duration-200 cursor-pointer focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 disabled:opacity-60 disabled:pointer-events-none active:scale-[0.98];
   }
   .btn-primary { @apply btn bg-accent text-white px-6 py-3 hover:bg-accent-dark hover:shadow-glow; }
   .btn-dark { @apply btn bg-ink-900 text-white px-6 py-3 hover:bg-ink-800; }
-  .btn-outline { @apply btn border border-zen-line bg-white text-ink-900 px-6 py-3 hover:bg-ink-900 hover:text-white hover:border-ink-900; }
-  .btn-ghost { @apply btn text-ink-700 hover:text-accent px-3 py-2 hover:bg-white; }
+  .btn-outline { @apply btn border border-zen-line bg-white/90 text-ink-900 px-6 py-3 hover:bg-ink-900 hover:text-white hover:border-ink-900; }
+  .btn-ghost { @apply btn text-ink-700 hover:text-accent px-3 py-2 hover:bg-white/80; }
 
-  .card { @apply bg-white rounded-2xl shadow-soft border border-zen-line overflow-hidden transition-all duration-300; }
+  .card { @apply bg-white/90 rounded-lg shadow-soft border border-zen-line overflow-hidden transition-all duration-300 backdrop-blur-sm; }
   .card-hover {
     transition: transform 220ms var(--ease-out-quart), box-shadow 220ms var(--ease-out-quart), border-color 220ms var(--ease-out-quart);
   }
@@ -81,28 +82,28 @@ body {
     border-color: rgba(220, 38, 38, 0.16);
   }
 
-  .badge { @apply inline-flex items-center gap-1 text-[11px] font-bold uppercase tracking-[0.22em] px-2.5 py-1 rounded-full; }
+  .badge { @apply inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-[0.22em] px-2.5 py-1 rounded-md; }
   .badge-accent { @apply badge bg-accent text-white; }
   .badge-dark { @apply badge bg-ink-900 text-white; }
-  .badge-soft { @apply badge bg-zen-line text-ink-700; }
+  .badge-soft { @apply badge bg-white/90 text-ink-700 border border-white/70; }
 
-  .chip { @apply inline-flex items-center gap-1.5 text-sm font-medium px-4 py-2 rounded-full bg-white border border-zen-line text-ink-700 min-h-[44px] transition-colors duration-200 hover:border-ink-900 hover:text-ink-900; }
+  .chip { @apply inline-flex min-h-[44px] items-center gap-1.5 rounded-lg border border-zen-line bg-white/90 px-4 py-2 text-sm font-semibold text-ink-700 transition-all duration-200 hover:border-ink-900 hover:text-ink-900 hover:shadow-soft; }
 
-  .section-title { @apply font-display text-4xl md:text-5xl text-ink-900 font-semibold tracking-tight leading-[1.03]; }
-  .section-eyebrow { @apply text-accent text-xs font-bold uppercase tracking-[0.32em] mb-3; }
+  .section-title { @apply font-display text-4xl md:text-5xl text-ink-900 font-semibold leading-[1.02]; }
+  .section-eyebrow { @apply text-accent text-xs font-extrabold uppercase tracking-[0.34em] mb-3; }
 
-  .input { @apply w-full px-4 py-3 border border-zen-line rounded-2xl bg-white focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/20 transition-all duration-200; }
+  .input { @apply w-full min-h-[44px] rounded-lg border border-zen-line bg-white/95 px-4 py-3 focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/20 transition-all duration-200; }
   .label { @apply text-sm font-semibold text-ink-800 mb-1.5 block; }
 
-  .surface-panel { @apply bg-white rounded-3xl border border-zen-line shadow-soft; }
+  .surface-panel { @apply bg-white/90 rounded-lg border border-zen-line shadow-soft backdrop-blur-sm; }
   .hero-frame {
     position: relative;
     overflow: hidden;
-    border-radius: 2rem;
+    border-radius: 0.75rem;
     border: 1px solid rgba(255, 255, 255, 0.14);
-    background: #0f172a;
+    background: #121416;
     color: white;
-    box-shadow: 0 30px 80px -35px rgba(15, 23, 42, 0.68);
+    box-shadow: 0 34px 90px -44px rgba(18, 20, 22, 0.78);
   }
 
   .page-enter { animation: fade-up 420ms var(--ease-out-expo) both; }
