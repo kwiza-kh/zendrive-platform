@@ -1,7 +1,7 @@
 export const API_BASE_URL =
-  process.env.REACT_APP_API_BASE_URL || "http://localhost:8000";
+  process.env.REACT_APP_API_BASE_URL ?? "";
 export const STATIC_BASE_URL =
-  process.env.REACT_APP_STATIC_BASE_URL || "http://localhost:8000";
+  process.env.REACT_APP_STATIC_BASE_URL ?? "";
 
 export const resolveImage = (src) => {
   if (!src) return "https://images.unsplash.com/photo-1494976388531-d1058494cdd8?w=1200";
