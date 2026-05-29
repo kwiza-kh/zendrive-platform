@@ -2,7 +2,7 @@ import React from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import {
   FiHome, FiTruck, FiTag, FiLayers,
-  FiLogOut, FiMapPin, FiShare2, FiX,
+  FiLogOut, FiMapPin, FiShare2, FiX, FiLock, FiImage,
 } from "react-icons/fi";
 import { useMobile } from "../context/MobileContext";
 
@@ -22,10 +22,22 @@ const navGroups = [
     ],
   },
   {
+    label: "Content",
+    items: [
+      { to: "/banners", label: "Banners", icon: FiImage },
+    ],
+  },
+  {
     label: "Customer",
     items: [
       { to: "/contact-info", label: "Contact Info", icon: FiMapPin },
       { to: "/social-media", label: "Social Media", icon: FiShare2 },
+    ],
+  },
+  {
+    label: "Account",
+    items: [
+      { to: "/security", label: "Change Password", icon: FiLock },
     ],
   },
 ];
@@ -54,13 +66,13 @@ export default function Sidebar() {
             <img
               src="/logo.png"
               alt="Zendrive"
-              className="w-8 h-8 rounded-xl object-cover flex-shrink-0 shadow-soft"
+              className="w-8 h-8 rounded-lg object-cover flex-shrink-0"
             />
             <div>
               <div className="font-extrabold tracking-tight text-base leading-none">
                 ZEN<span className="text-accent">DRIVE</span>
               </div>
-              <p className="text-[10px] uppercase tracking-widest text-white/40 mt-1">
+              <p className="text-[10px] uppercase tracking-widest text-white/35 mt-1">
                 Admin Console
               </p>
             </div>
@@ -68,22 +80,22 @@ export default function Sidebar() {
           {isMobile && (
             <button
               onClick={closeSidebar}
-              className="w-8 h-8 grid place-items-center rounded-full text-white/60 hover:text-white hover:bg-white/10 transition-all duration-200"
+              className="w-8 h-8 grid place-items-center rounded-lg text-white/50 hover:text-white hover:bg-white/10 transition-colors duration-200"
               aria-label="Close sidebar"
             >
-              <FiX size={18} />
+              <FiX size={16} />
             </button>
           )}
         </div>
       </div>
 
       {/* Nav */}
-      <nav className="flex-1 overflow-y-auto py-4 px-3 space-y-6">
+      <nav className="flex-1 overflow-y-auto py-5 px-3 space-y-5">
         {navGroups.map((group) => (
           <div key={group.label}>
-              <p className="text-[10px] font-bold uppercase tracking-widest text-white/30 px-3 mb-1.5">
-                {group.label}
-              </p>
+            <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-white/25 px-3 mb-2">
+              {group.label}
+            </p>
             <div className="space-y-0.5">
               {group.items.map(({ to, label, icon: Icon, end }) => (
                 <NavLink
@@ -92,15 +104,21 @@ export default function Sidebar() {
                   end={end}
                   onClick={isMobile ? closeSidebar : undefined}
                   className={({ isActive }) =>
-                    `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${
+                    `flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors duration-150 ${
                       isActive
-                        ? "bg-white/10 text-white shadow-[0_0_0_1px_rgba(220,38,38,0.16)] translate-x-0.5"
-                        : "text-white/60 hover:bg-white/10 hover:text-white/90"
+                        ? "bg-white/[0.08] text-white"
+                        : "text-white/50 hover:bg-white/[0.05] hover:text-white/80"
                     }`
                   }
                 >
-                  <Icon size={16} className="flex-shrink-0" />
-                  {label}
+                  {({ isActive }) => (
+                    <>
+                      <span className={`flex-shrink-0 transition-colors duration-150 ${isActive ? "text-accent" : ""}`}>
+                        <Icon size={15} />
+                      </span>
+                      {label}
+                    </>
+                  )}
                 </NavLink>
               ))}
             </div>
@@ -111,7 +129,7 @@ export default function Sidebar() {
       {/* User */}
       <div className="px-3 py-4 border-t border-white/8">
         <div className="flex items-center gap-3 px-2 mb-2">
-          <div className="w-8 h-8 rounded-full bg-accent flex items-center justify-center text-xs font-bold flex-shrink-0 shadow-soft">
+          <div className="w-7 h-7 rounded-lg bg-accent flex items-center justify-center text-[10px] font-bold flex-shrink-0">
             {initials}
           </div>
           {user && (
@@ -119,13 +137,13 @@ export default function Sidebar() {
               <p className="text-sm font-semibold truncate leading-none mb-0.5">
                 {user.name}
               </p>
-              <p className="text-[11px] text-white/40 truncate">{user.email}</p>
+              <p className="text-[10px] text-white/35 truncate">{user.email}</p>
             </div>
           )}
         </div>
         <button
           onClick={logout}
-          className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-sm text-white/50 hover:bg-white/10 hover:text-white/80 transition-all duration-200"
+          className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-white/40 hover:bg-white/[0.05] hover:text-white/70 transition-colors duration-150"
         >
           <FiLogOut size={14} />
           Sign out
@@ -137,16 +155,14 @@ export default function Sidebar() {
   if (isMobile) {
     return (
       <>
-        {/* Overlay */}
         {sidebarOpen && (
           <div
             className="fixed inset-0 bg-black/50 z-30 transition-opacity duration-200"
             onClick={closeSidebar}
           />
         )}
-        {/* Sidebar */}
         <aside
-          className={`fixed left-0 top-0 h-screen w-64 bg-ink-900 text-white flex flex-col z-40 transform transition-transform duration-300 ease-out shadow-[24px_0_60px_-36px_rgba(15,23,42,0.55)] ${
+          className={`fixed left-0 top-0 h-screen w-64 bg-ink-900 text-white flex flex-col z-40 transform transition-transform duration-300 ease-out shadow-lift ${
             sidebarOpen ? "translate-x-0" : "-translate-x-full"
           }`}
         >
@@ -157,7 +173,7 @@ export default function Sidebar() {
   }
 
   return (
-    <aside className="fixed left-0 top-0 h-screen w-64 bg-ink-900 text-white flex flex-col z-30 shadow-[24px_0_60px_-36px_rgba(15,23,42,0.55)]">
+    <aside className="fixed left-0 top-0 h-screen w-64 bg-ink-900 text-white flex flex-col z-30 border-r border-white/[0.05]">
       {sidebarContent}
     </aside>
   );

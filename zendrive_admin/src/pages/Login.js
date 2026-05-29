@@ -30,30 +30,76 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen grid place-items-center bg-ink-900 p-4">
-      <div className="card !bg-white p-8 w-full max-w-md">
-        <div className="flex items-center gap-2 mb-6">
-          <img src="/logo.png" alt="Zendrive" className="w-10 h-10 rounded-lg object-cover" />
-          <div className="font-extrabold tracking-tight text-xl">
-            <span>ZEN</span><span className="text-accent">DRIVE</span>
+    <div className="min-h-screen flex">
+      {/* Left panel */}
+      <div className="hidden lg:flex lg:w-[420px] xl:w-[480px] flex-col justify-between bg-ink-900 p-10 flex-shrink-0">
+        <div className="flex items-center gap-3">
+          <img src="/logo.png" alt="Zendrive" className="w-9 h-9 rounded-lg object-cover" />
+          <div className="font-extrabold tracking-tight text-lg text-white">
+            ZEN<span className="text-accent">DRIVE</span>
           </div>
         </div>
-        <h1 className="text-2xl font-bold mb-1">Admin Sign in</h1>
-        <p className="text-sm text-ink-500 mb-6">Manage your Zendrive inventory.</p>
-        <form onSubmit={submit} className="space-y-4">
-          <div>
-            <label className="label" htmlFor="admin-email">Email</label>
-            <input id="admin-email" className="input" type="email" required value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
+        <div>
+          <p className="text-3xl font-display font-bold text-white leading-snug tracking-tight mb-3">
+            Admin Console
+          </p>
+          <p className="text-sm text-white/40 leading-relaxed">
+            Manage your vehicle inventory, brand listings,<br />and site content from one place.
+          </p>
+        </div>
+        <p className="text-xs text-white/20">© {new Date().getFullYear()} Zendrive. All rights reserved.</p>
+      </div>
+
+      {/* Right panel */}
+      <div className="flex-1 flex items-center justify-center p-6 bg-zen-bg">
+        <div className="w-full max-w-sm">
+          {/* Mobile logo */}
+          <div className="flex items-center gap-2 mb-8 lg:hidden">
+            <img src="/logo.png" alt="Zendrive" className="w-8 h-8 rounded-lg object-cover" />
+            <div className="font-extrabold tracking-tight text-lg">
+              ZEN<span className="text-accent">DRIVE</span>
+            </div>
           </div>
-          <div>
-            <label className="label" htmlFor="admin-password">Password</label>
-            <input id="admin-password" className="input" type="password" required value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} />
-          </div>
-          {err && <p className="text-accent text-sm">{err}</p>}
-          <button disabled={loading} className="btn-primary w-full !py-3 justify-center">
-            {loading ? "Signing in..." : "Sign in"}
-          </button>
-        </form>
+
+          <h1 className="text-2xl font-bold text-ink-900 mb-1 tracking-tight">Sign in</h1>
+          <p className="text-sm text-ink-400 mb-8">Enter your admin credentials to continue.</p>
+
+          <form onSubmit={submit} className="space-y-4">
+            <div>
+              <label className="label" htmlFor="admin-email">Email</label>
+              <input
+                id="admin-email"
+                className="input"
+                type="email"
+                required
+                value={form.email}
+                onChange={(e) => setForm({ ...form, email: e.target.value })}
+              />
+            </div>
+            <div>
+              <label className="label" htmlFor="admin-password">Password</label>
+              <input
+                id="admin-password"
+                className="input"
+                type="password"
+                required
+                autoComplete="current-password"
+                value={form.password}
+                onChange={(e) => setForm({ ...form, password: e.target.value })}
+              />
+            </div>
+
+            {err && (
+              <div className="text-sm text-accent bg-red-50 border border-red-200 rounded-lg px-4 py-3">
+                {err}
+              </div>
+            )}
+
+            <button disabled={loading} className="btn-primary w-full justify-center !py-2.5 mt-2">
+              {loading ? "Signing in…" : "Sign in"}
+            </button>
+          </form>
+        </div>
       </div>
     </div>
   );

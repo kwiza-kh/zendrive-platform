@@ -7,9 +7,9 @@ import CarImagesUpload from "../components/CarImagesUpload";
 const slugify = (s) => s.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 
 const empty = {
-  name: "", slug: "", brand_id: "", body_type: "Sedan", fuel_type: "Gasoline",
-  transmission: "Automatic", year: 2025, mileage_km: 0, seats: 5, horsepower: 0,
-  color: "Black", price: 0, discount_price: "", description: "", image: "", images: "",
+  name: "", slug: "", brand_id: "", body_type: "Sedan",
+  year: 2025, mileage_km: 0,
+  price: 0, discount_price: "", description: "", image: "", images: "",
   is_featured: false, is_new: true, in_stock: true,
 };
 
@@ -42,7 +42,6 @@ export default function CarForm() {
     const payload = {
       ...form,
       year: Number(form.year), mileage_km: Number(form.mileage_km),
-      seats: Number(form.seats), horsepower: Number(form.horsepower),
       price: Number(form.price),
       discount_price: form.discount_price === "" || form.discount_price === null ? null : Number(form.discount_price),
       brand_id: form.brand_id ? Number(form.brand_id) : null,
@@ -68,7 +67,7 @@ export default function CarForm() {
           <div><label className="label">Name</label><input className="input" required value={form.name} onChange={(e) => onName(e.target.value)} /></div>
           <div><label className="label">Slug</label><input className="input" required value={form.slug} onChange={(e) => set("slug", slugify(e.target.value))} /></div>
         </div>
-        <div className="grid md:grid-cols-3 gap-4">
+        <div className="grid md:grid-cols-2 gap-4">
           <div>
             <label className="label">Brand</label>
             <select className="input" value={form.brand_id} onChange={(e) => set("brand_id", e.target.value)}>
@@ -84,27 +83,10 @@ export default function CarForm() {
                 : bodyTypes.map((x) => <option key={x.id} value={x.name}>{x.name}</option>)}
             </select>
           </div>
-          <div>
-            <label className="label">Fuel</label>
-            <select className="input" value={form.fuel_type} onChange={(e) => set("fuel_type", e.target.value)}>
-              {["Gasoline","Diesel","Hybrid","Electric"].map((x) => <option key={x}>{x}</option>)}
-            </select>
-          </div>
-        </div>
-        <div className="grid md:grid-cols-4 gap-4">
-          <div><label className="label">Year</label><input className="input" type="number" value={form.year} onChange={(e) => set("year", e.target.value)} /></div>
-          <div><label className="label">Mileage (km)</label><input className="input" type="number" value={form.mileage_km} onChange={(e) => set("mileage_km", e.target.value)} /></div>
-          <div><label className="label">Horsepower</label><input className="input" type="number" value={form.horsepower} onChange={(e) => set("horsepower", e.target.value)} /></div>
-          <div><label className="label">Seats</label><input className="input" type="number" value={form.seats} onChange={(e) => set("seats", e.target.value)} /></div>
         </div>
         <div className="grid md:grid-cols-2 gap-4">
-          <div>
-            <label className="label">Transmission</label>
-            <select className="input" value={form.transmission} onChange={(e) => set("transmission", e.target.value)}>
-              {["Automatic","Manual","CVT","Dual-Clutch"].map((x) => <option key={x}>{x}</option>)}
-            </select>
-          </div>
-          <div><label className="label">Color</label><input className="input" value={form.color} onChange={(e) => set("color", e.target.value)} /></div>
+          <div><label className="label">Year</label><input className="input" type="number" value={form.year} onChange={(e) => set("year", e.target.value)} /></div>
+          <div><label className="label">Mileage (km)</label><input className="input" type="number" value={form.mileage_km} onChange={(e) => set("mileage_km", e.target.value)} /></div>
         </div>
         <CarImagesUpload
           cover={form.image}

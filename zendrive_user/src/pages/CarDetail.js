@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { carsApi } from "../services/api";
 import { resolveImage, formatPrice } from "../utils/constants";
-import { FiZap, FiSettings, FiUsers, FiActivity, FiCalendar, FiDroplet, FiCheck, FiArrowLeft, FiShoppingCart } from "react-icons/fi";
+import { FiCheck, FiArrowLeft, FiShoppingCart } from "react-icons/fi";
 import { useCart } from "../context/CartContext";
 
 export default function CarDetail() {
@@ -35,15 +35,6 @@ export default function CarDetail() {
     ...(car.images ? car.images.split(",").map((s) => s.trim()).filter(Boolean) : []),
   ];
   const shown = gallery[activeImg] || car.image;
-  const specs = [
-    [FiCalendar, "Year", car.year],
-    [FiActivity, "Power", `${car.horsepower} HP`],
-    [FiSettings, "Transmission", car.transmission],
-    [FiZap, "Fuel", car.fuel_type],
-    [FiUsers, "Seats", car.seats],
-    [FiDroplet, "Color", car.color],
-  ];
-
   return (
     <div className="container-zen py-10 page-enter">
       <Link to="/cars" className="inline-flex items-center gap-2 text-sm font-semibold text-ink-700 hover:text-accent mb-6 transition-colors duration-200">
@@ -80,20 +71,7 @@ export default function CarDetail() {
             <h2 className="font-display text-3xl mb-4">Overview</h2>
             <p className="text-ink-700 leading-relaxed">{car.description}</p>
 
-            <h3 className="font-bold mt-8 mb-4 uppercase tracking-widest text-xs text-accent">Specifications</h3>
-            <div className="grid sm:grid-cols-2 gap-3">
-              {specs.map(([Icon, k, v]) => (
-                <div key={k} className="flex items-center justify-between p-4 bg-zen-bg rounded-lg border border-zen-line">
-                  <div className="flex items-center gap-2.5 text-ink-700">
-                    <Icon className="text-accent" />
-                    <span className="text-sm font-semibold">{k}</span>
-                  </div>
-                  <span className="font-bold text-ink-900">{v}</span>
-                </div>
-              ))}
-            </div>
-
-            <h3 className="font-bold mt-8 mb-4 uppercase tracking-widest text-xs text-accent">What's included</h3>
+<h3 className="font-bold mt-8 mb-4 uppercase tracking-widest text-xs text-accent">What's included</h3>
             <div className="grid sm:grid-cols-2 gap-2">
               {[
                 "Free nationwide delivery",
@@ -144,20 +122,6 @@ export default function CarDetail() {
               )}
             </button>
 
-            <div className="grid grid-cols-3 gap-2 mt-6">
-              <div className="text-center bg-zen-bg rounded-lg py-3 border border-zen-line">
-                <p className="text-[10px] uppercase tracking-widest text-ink-500">Power</p>
-                <p className="font-bold mt-0.5">{car.horsepower} HP</p>
-              </div>
-              <div className="text-center bg-zen-bg rounded-lg py-3 border border-zen-line">
-                <p className="text-[10px] uppercase tracking-widest text-ink-500">Body</p>
-                <p className="font-bold mt-0.5">{car.body_type}</p>
-              </div>
-              <div className="text-center bg-zen-bg rounded-lg py-3 border border-zen-line">
-                <p className="text-[10px] uppercase tracking-widest text-ink-500">Year</p>
-                <p className="font-bold mt-0.5">{car.year}</p>
-              </div>
-            </div>
           </div>
 
           <div className="card p-7 md:p-8">
